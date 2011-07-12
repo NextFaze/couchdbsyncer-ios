@@ -1,0 +1,721 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B54F1B7F13CAD64000F9F874 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54F1B7E13CAD64000F9F874 /* Foundation.framework */; };
+		B54F1BAA13CAD70600F9F874 /* NSDataAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B8913CAD70600F9F874 /* NSDataAdditions.h */; };
+		B54F1BAB13CAD70600F9F874 /* NSDataAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */; };
+		B54F1BAC13CAD70600F9F874 /* CouchDBSyncer.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B8B13CAD70600F9F874 /* CouchDBSyncer.h */; };
+		B54F1BAD13CAD70600F9F874 /* CouchDBSyncer.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8C13CAD70600F9F874 /* CouchDBSyncer.m */; };
+		B54F1BAE13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8D13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld */; };
+		B54F1BAF13CAD70600F9F874 /* CouchDBSyncerAttachment.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B8F13CAD70600F9F874 /* CouchDBSyncerAttachment.h */; };
+		B54F1BB013CAD70600F9F874 /* CouchDBSyncerAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9013CAD70600F9F874 /* CouchDBSyncerAttachment.m */; };
+		B54F1BB113CAD70600F9F874 /* CouchDBSyncerBulkFetch.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9113CAD70600F9F874 /* CouchDBSyncerBulkFetch.h */; };
+		B54F1BB213CAD70600F9F874 /* CouchDBSyncerBulkFetch.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9213CAD70600F9F874 /* CouchDBSyncerBulkFetch.m */; };
+		B54F1BB313CAD70600F9F874 /* CouchDBSyncerDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9313CAD70600F9F874 /* CouchDBSyncerDebug.h */; };
+		B54F1BB413CAD70600F9F874 /* CouchDBSyncerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9413CAD70600F9F874 /* CouchDBSyncerDelegate.h */; };
+		B54F1BB513CAD70600F9F874 /* CouchDBSyncerDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9513CAD70600F9F874 /* CouchDBSyncerDocument.h */; };
+		B54F1BB613CAD70600F9F874 /* CouchDBSyncerDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9613CAD70600F9F874 /* CouchDBSyncerDocument.m */; };
+		B54F1BB713CAD70600F9F874 /* CouchDBSyncerError.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9713CAD70600F9F874 /* CouchDBSyncerError.h */; };
+		B54F1BB813CAD70600F9F874 /* CouchDBSyncerError.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9813CAD70600F9F874 /* CouchDBSyncerError.m */; };
+		B54F1BB913CAD70600F9F874 /* CouchDBSyncerFetch.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9913CAD70600F9F874 /* CouchDBSyncerFetch.h */; };
+		B54F1BBA13CAD70600F9F874 /* CouchDBSyncerFetch.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9A13CAD70600F9F874 /* CouchDBSyncerFetch.m */; };
+		B54F1BBB13CAD70600F9F874 /* CouchDBSyncerObject.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9B13CAD70600F9F874 /* CouchDBSyncerObject.h */; };
+		B54F1BBC13CAD70600F9F874 /* CouchDBSyncerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */; };
+		B54F1BBD13CAD70600F9F874 /* CouchDBSyncerResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9D13CAD70600F9F874 /* CouchDBSyncerResponse.h */; };
+		B54F1BBE13CAD70600F9F874 /* CouchDBSyncerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9E13CAD70600F9F874 /* CouchDBSyncerResponse.m */; };
+		B54F1BBF13CAD70600F9F874 /* CouchDBSyncerStore.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */; };
+		B54F1BC013CAD70600F9F874 /* CouchDBSyncerStore.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */; };
+		B54F1BC113CAD70600F9F874 /* CouchDBSyncerStorePolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA113CAD70600F9F874 /* CouchDBSyncerStorePolicy.h */; };
+		B54F1BC213CAD70600F9F874 /* CouchDBSyncerStorePolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA213CAD70600F9F874 /* CouchDBSyncerStorePolicy.m */; };
+		B54F1BC313CAD70600F9F874 /* MOCouchDBSyncerAttachment.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */; };
+		B54F1BC413CAD70600F9F874 /* MOCouchDBSyncerAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */; };
+		B54F1BC513CAD70600F9F874 /* MOCouchDBSyncerDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */; };
+		B54F1BC613CAD70600F9F874 /* MOCouchDBSyncerDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */; };
+		B54F1BC713CAD70600F9F874 /* MOCouchDBSyncerDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */; };
+		B54F1BC813CAD70600F9F874 /* MOCouchDBSyncerDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */; };
+		B54F1BE513CAD76000F9F874 /* NSObject+SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BCC13CAD76000F9F874 /* NSObject+SBJson.h */; };
+		B54F1BE613CAD76000F9F874 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BCD13CAD76000F9F874 /* NSObject+SBJson.m */; };
+		B54F1BE713CAD76000F9F874 /* SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BCE13CAD76000F9F874 /* SBJson.h */; };
+		B54F1BE813CAD76000F9F874 /* SBJsonParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BCF13CAD76000F9F874 /* SBJsonParser.h */; };
+		B54F1BE913CAD76000F9F874 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BD013CAD76000F9F874 /* SBJsonParser.m */; };
+		B54F1BEA13CAD76000F9F874 /* SBJsonStreamParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BD113CAD76000F9F874 /* SBJsonStreamParser.h */; };
+		B54F1BEB13CAD76000F9F874 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BD213CAD76000F9F874 /* SBJsonStreamParser.m */; };
+		B54F1BEC13CAD76000F9F874 /* SBJsonStreamParserAccumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BD313CAD76000F9F874 /* SBJsonStreamParserAccumulator.h */; };
+		B54F1BED13CAD76000F9F874 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BD413CAD76000F9F874 /* SBJsonStreamParserAccumulator.m */; };
+		B54F1BEE13CAD76000F9F874 /* SBJsonStreamParserAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BD513CAD76000F9F874 /* SBJsonStreamParserAdapter.h */; };
+		B54F1BEF13CAD76000F9F874 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BD613CAD76000F9F874 /* SBJsonStreamParserAdapter.m */; };
+		B54F1BF013CAD76000F9F874 /* SBJsonStreamParserState.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BD713CAD76000F9F874 /* SBJsonStreamParserState.h */; };
+		B54F1BF113CAD76000F9F874 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BD813CAD76000F9F874 /* SBJsonStreamParserState.m */; };
+		B54F1BF213CAD76000F9F874 /* SBJsonStreamWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BD913CAD76000F9F874 /* SBJsonStreamWriter.h */; };
+		B54F1BF313CAD76000F9F874 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BDA13CAD76000F9F874 /* SBJsonStreamWriter.m */; };
+		B54F1BF413CAD76000F9F874 /* SBJsonStreamWriterAccumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BDB13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.h */; };
+		B54F1BF513CAD76000F9F874 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BDC13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.m */; };
+		B54F1BF613CAD76000F9F874 /* SBJsonStreamWriterState.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BDD13CAD76000F9F874 /* SBJsonStreamWriterState.h */; };
+		B54F1BF713CAD76000F9F874 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BDE13CAD76000F9F874 /* SBJsonStreamWriterState.m */; };
+		B54F1BF813CAD76000F9F874 /* SBJsonTokeniser.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BDF13CAD76000F9F874 /* SBJsonTokeniser.h */; };
+		B54F1BF913CAD76000F9F874 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BE013CAD76000F9F874 /* SBJsonTokeniser.m */; };
+		B54F1BFA13CAD76000F9F874 /* SBJsonUTF8Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BE113CAD76000F9F874 /* SBJsonUTF8Stream.h */; };
+		B54F1BFB13CAD76000F9F874 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BE213CAD76000F9F874 /* SBJsonUTF8Stream.m */; };
+		B54F1BFC13CAD76000F9F874 /* SBJsonWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BE313CAD76000F9F874 /* SBJsonWriter.h */; };
+		B54F1BFD13CAD76000F9F874 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BE413CAD76000F9F874 /* SBJsonWriter.m */; };
+		B55C282413CADC78000412E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C282313CADC78000412E6 /* UIKit.framework */; };
+		B55C282513CADC78000412E6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54F1B7E13CAD64000F9F874 /* Foundation.framework */; };
+		B55C282713CADC78000412E6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C282613CADC78000412E6 /* CoreGraphics.framework */; };
+		B55C282D13CADC78000412E6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B55C282B13CADC78000412E6 /* InfoPlist.strings */; };
+		B55C283013CADC78000412E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C282F13CADC78000412E6 /* main.m */; };
+		B55C283313CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C283213CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m */; };
+		B55C283613CADC78000412E6 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C283413CADC78000412E6 /* MainWindow.xib */; };
+		B55C284D13CADD17000412E6 /* TestAppDocListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284313CADD17000412E6 /* TestAppDocListViewController.h */; };
+		B55C284F13CADD17000412E6 /* TestAppDocViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284513CADD17000412E6 /* TestAppDocViewController.h */; };
+		B55C285113CADD17000412E6 /* TestAppViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284813CADD17000412E6 /* TestAppViewController.h */; };
+		B55C285313CADE25000412E6 /* TestAppDocListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284413CADD17000412E6 /* TestAppDocListViewController.m */; };
+		B55C285413CADE28000412E6 /* TestAppDocViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284613CADD17000412E6 /* TestAppDocViewController.m */; };
+		B55C285513CADE2E000412E6 /* TestAppDocViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C284713CADD17000412E6 /* TestAppDocViewController.xib */; };
+		B55C285613CADE32000412E6 /* TestAppViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284913CADD17000412E6 /* TestAppViewController.m */; };
+		B55C285713CADE36000412E6 /* TestAppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C284A13CADD17000412E6 /* TestAppViewController.xib */; };
+		B55C286213CADE79000412E6 /* NSDataAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */; };
+		B55C286713CADEA5000412E6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C286613CADEA5000412E6 /* CoreData.framework */; };
+		B55C286B13CADF36000412E6 /* libCouchDBSyncer-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */; };
+		B55C28BC13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B55C28BA13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B55C286913CADF08000412E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B54F1B7213CAD64000F9F874 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B54F1B7A13CAD64000F9F874;
+			remoteInfo = "CouchDBSyncer-iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchDBSyncer-iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B54F1B7E13CAD64000F9F874 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		B54F1B8213CAD64000F9F874 /* CouchDBSyncer-iOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CouchDBSyncer-iOS-Prefix.pch"; sourceTree = "<group>"; };
+		B54F1B8913CAD70600F9F874 /* NSDataAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDataAdditions.h; sourceTree = "<group>"; };
+		B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDataAdditions.m; sourceTree = "<group>"; };
+		B54F1B8B13CAD70600F9F874 /* CouchDBSyncer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncer.h; sourceTree = "<group>"; };
+		B54F1B8C13CAD70600F9F874 /* CouchDBSyncer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncer.m; sourceTree = "<group>"; };
+		B54F1B8E13CAD70600F9F874 /* CouchDBSyncer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CouchDBSyncer.xcdatamodel; sourceTree = "<group>"; };
+		B54F1B8F13CAD70600F9F874 /* CouchDBSyncerAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerAttachment.h; sourceTree = "<group>"; };
+		B54F1B9013CAD70600F9F874 /* CouchDBSyncerAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerAttachment.m; sourceTree = "<group>"; };
+		B54F1B9113CAD70600F9F874 /* CouchDBSyncerBulkFetch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerBulkFetch.h; sourceTree = "<group>"; };
+		B54F1B9213CAD70600F9F874 /* CouchDBSyncerBulkFetch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerBulkFetch.m; sourceTree = "<group>"; };
+		B54F1B9313CAD70600F9F874 /* CouchDBSyncerDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerDebug.h; sourceTree = "<group>"; };
+		B54F1B9413CAD70600F9F874 /* CouchDBSyncerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerDelegate.h; sourceTree = "<group>"; };
+		B54F1B9513CAD70600F9F874 /* CouchDBSyncerDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerDocument.h; sourceTree = "<group>"; };
+		B54F1B9613CAD70600F9F874 /* CouchDBSyncerDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerDocument.m; sourceTree = "<group>"; };
+		B54F1B9713CAD70600F9F874 /* CouchDBSyncerError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerError.h; sourceTree = "<group>"; };
+		B54F1B9813CAD70600F9F874 /* CouchDBSyncerError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerError.m; sourceTree = "<group>"; };
+		B54F1B9913CAD70600F9F874 /* CouchDBSyncerFetch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerFetch.h; sourceTree = "<group>"; };
+		B54F1B9A13CAD70600F9F874 /* CouchDBSyncerFetch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerFetch.m; sourceTree = "<group>"; };
+		B54F1B9B13CAD70600F9F874 /* CouchDBSyncerObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerObject.h; sourceTree = "<group>"; };
+		B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerObject.m; sourceTree = "<group>"; };
+		B54F1B9D13CAD70600F9F874 /* CouchDBSyncerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerResponse.h; sourceTree = "<group>"; };
+		B54F1B9E13CAD70600F9F874 /* CouchDBSyncerResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerResponse.m; sourceTree = "<group>"; };
+		B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerStore.h; sourceTree = "<group>"; };
+		B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerStore.m; sourceTree = "<group>"; };
+		B54F1BA113CAD70600F9F874 /* CouchDBSyncerStorePolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerStorePolicy.h; sourceTree = "<group>"; };
+		B54F1BA213CAD70600F9F874 /* CouchDBSyncerStorePolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerStorePolicy.m; sourceTree = "<group>"; };
+		B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerAttachment.h; sourceTree = "<group>"; };
+		B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerAttachment.m; sourceTree = "<group>"; };
+		B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDatabase.h; sourceTree = "<group>"; };
+		B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDatabase.m; sourceTree = "<group>"; };
+		B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDocument.h; sourceTree = "<group>"; };
+		B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDocument.m; sourceTree = "<group>"; };
+		B54F1BCC13CAD76000F9F874 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJson.h"; sourceTree = "<group>"; };
+		B54F1BCD13CAD76000F9F874 /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJson.m"; sourceTree = "<group>"; };
+		B54F1BCE13CAD76000F9F874 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
+		B54F1BCF13CAD76000F9F874 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
+		B54F1BD013CAD76000F9F874 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
+		B54F1BD113CAD76000F9F874 /* SBJsonStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParser.h; sourceTree = "<group>"; };
+		B54F1BD213CAD76000F9F874 /* SBJsonStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParser.m; sourceTree = "<group>"; };
+		B54F1BD313CAD76000F9F874 /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserAccumulator.h; sourceTree = "<group>"; };
+		B54F1BD413CAD76000F9F874 /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserAccumulator.m; sourceTree = "<group>"; };
+		B54F1BD513CAD76000F9F874 /* SBJsonStreamParserAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserAdapter.h; sourceTree = "<group>"; };
+		B54F1BD613CAD76000F9F874 /* SBJsonStreamParserAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserAdapter.m; sourceTree = "<group>"; };
+		B54F1BD713CAD76000F9F874 /* SBJsonStreamParserState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserState.h; sourceTree = "<group>"; };
+		B54F1BD813CAD76000F9F874 /* SBJsonStreamParserState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserState.m; sourceTree = "<group>"; };
+		B54F1BD913CAD76000F9F874 /* SBJsonStreamWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriter.h; sourceTree = "<group>"; };
+		B54F1BDA13CAD76000F9F874 /* SBJsonStreamWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriter.m; sourceTree = "<group>"; };
+		B54F1BDB13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriterAccumulator.h; sourceTree = "<group>"; };
+		B54F1BDC13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriterAccumulator.m; sourceTree = "<group>"; };
+		B54F1BDD13CAD76000F9F874 /* SBJsonStreamWriterState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriterState.h; sourceTree = "<group>"; };
+		B54F1BDE13CAD76000F9F874 /* SBJsonStreamWriterState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriterState.m; sourceTree = "<group>"; };
+		B54F1BDF13CAD76000F9F874 /* SBJsonTokeniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonTokeniser.h; sourceTree = "<group>"; };
+		B54F1BE013CAD76000F9F874 /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonTokeniser.m; sourceTree = "<group>"; };
+		B54F1BE113CAD76000F9F874 /* SBJsonUTF8Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonUTF8Stream.h; sourceTree = "<group>"; };
+		B54F1BE213CAD76000F9F874 /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonUTF8Stream.m; sourceTree = "<group>"; };
+		B54F1BE313CAD76000F9F874 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
+		B54F1BE413CAD76000F9F874 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
+		B55C282113CADC78000412E6 /* CouchDBSyncer-Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CouchDBSyncer-Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B55C282313CADC78000412E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		B55C282613CADC78000412E6 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		B55C282A13CADC78000412E6 /* CouchDBSyncer-Test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CouchDBSyncer-Test-Info.plist"; sourceTree = "<group>"; };
+		B55C282C13CADC78000412E6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B55C282E13CADC78000412E6 /* CouchDBSyncer-Test-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CouchDBSyncer-Test-Prefix.pch"; sourceTree = "<group>"; };
+		B55C282F13CADC78000412E6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B55C283113CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncer_TestAppDelegate.h; sourceTree = "<group>"; };
+		B55C283213CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncer_TestAppDelegate.m; sourceTree = "<group>"; };
+		B55C283513CADC78000412E6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		B55C284313CADD17000412E6 /* TestAppDocListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppDocListViewController.h; sourceTree = "<group>"; };
+		B55C284413CADD17000412E6 /* TestAppDocListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppDocListViewController.m; sourceTree = "<group>"; };
+		B55C284513CADD17000412E6 /* TestAppDocViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppDocViewController.h; sourceTree = "<group>"; };
+		B55C284613CADD17000412E6 /* TestAppDocViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppDocViewController.m; sourceTree = "<group>"; };
+		B55C284713CADD17000412E6 /* TestAppDocViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppDocViewController.xib; sourceTree = "<group>"; };
+		B55C284813CADD17000412E6 /* TestAppViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppViewController.h; sourceTree = "<group>"; };
+		B55C284913CADD17000412E6 /* TestAppViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppViewController.m; sourceTree = "<group>"; };
+		B55C284A13CADD17000412E6 /* TestAppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppViewController.xib; sourceTree = "<group>"; };
+		B55C286613CADEA5000412E6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		B55C28BB13CAE29F000412E6 /* CouchDBSyncer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CouchDBSyncer.xcdatamodel; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B54F1B7813CAD64000F9F874 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B54F1B7F13CAD64000F9F874 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B55C281E13CADC78000412E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B55C286B13CADF36000412E6 /* libCouchDBSyncer-iOS.a in Frameworks */,
+				B55C286713CADEA5000412E6 /* CoreData.framework in Frameworks */,
+				B55C282413CADC78000412E6 /* UIKit.framework in Frameworks */,
+				B55C282513CADC78000412E6 /* Foundation.framework in Frameworks */,
+				B55C282713CADC78000412E6 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B54F1B7013CAD64000F9F874 = {
+			isa = PBXGroup;
+			children = (
+				B54F1B8013CAD64000F9F874 /* CouchDBSyncer-iOS */,
+				B55C282813CADC78000412E6 /* CouchDBSyncer-Test */,
+				B54F1B7D13CAD64000F9F874 /* Frameworks */,
+				B54F1B7C13CAD64000F9F874 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B54F1B7C13CAD64000F9F874 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B55C282113CADC78000412E6 /* CouchDBSyncer-Test.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B54F1B7D13CAD64000F9F874 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B55C286613CADEA5000412E6 /* CoreData.framework */,
+				B54F1BCB13CAD76000F9F874 /* json-framework */,
+				B54F1B7E13CAD64000F9F874 /* Foundation.framework */,
+				B55C282313CADC78000412E6 /* UIKit.framework */,
+				B55C282613CADC78000412E6 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B54F1B8013CAD64000F9F874 /* CouchDBSyncer-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1BC913CAD70A00F9F874 /* Classes */,
+				B54F1B8813CAD70600F9F874 /* Additions */,
+				B54F1BA313CAD70600F9F874 /* Managed Objects */,
+				B54F1B8113CAD64000F9F874 /* Supporting Files */,
+			);
+			path = "CouchDBSyncer-iOS";
+			sourceTree = "<group>";
+		};
+		B54F1B8113CAD64000F9F874 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1B8213CAD64000F9F874 /* CouchDBSyncer-iOS-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B54F1B8813CAD70600F9F874 /* Additions */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1B8913CAD70600F9F874 /* NSDataAdditions.h */,
+				B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */,
+			);
+			path = Additions;
+			sourceTree = "<group>";
+		};
+		B54F1BA313CAD70600F9F874 /* Managed Objects */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1B8D13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld */,
+				B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */,
+				B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */,
+				B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */,
+				B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */,
+				B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */,
+				B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */,
+			);
+			path = "Managed Objects";
+			sourceTree = "<group>";
+		};
+		B54F1BC913CAD70A00F9F874 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1B8B13CAD70600F9F874 /* CouchDBSyncer.h */,
+				B54F1B8C13CAD70600F9F874 /* CouchDBSyncer.m */,
+				B54F1B8F13CAD70600F9F874 /* CouchDBSyncerAttachment.h */,
+				B54F1B9013CAD70600F9F874 /* CouchDBSyncerAttachment.m */,
+				B54F1B9313CAD70600F9F874 /* CouchDBSyncerDebug.h */,
+				B54F1B9413CAD70600F9F874 /* CouchDBSyncerDelegate.h */,
+				B54F1B9513CAD70600F9F874 /* CouchDBSyncerDocument.h */,
+				B54F1B9613CAD70600F9F874 /* CouchDBSyncerDocument.m */,
+				B54F1B9713CAD70600F9F874 /* CouchDBSyncerError.h */,
+				B54F1B9813CAD70600F9F874 /* CouchDBSyncerError.m */,
+				B54F1B9913CAD70600F9F874 /* CouchDBSyncerFetch.h */,
+				B54F1B9A13CAD70600F9F874 /* CouchDBSyncerFetch.m */,
+				B54F1B9113CAD70600F9F874 /* CouchDBSyncerBulkFetch.h */,
+				B54F1B9213CAD70600F9F874 /* CouchDBSyncerBulkFetch.m */,
+				B54F1B9B13CAD70600F9F874 /* CouchDBSyncerObject.h */,
+				B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */,
+				B54F1B9D13CAD70600F9F874 /* CouchDBSyncerResponse.h */,
+				B54F1B9E13CAD70600F9F874 /* CouchDBSyncerResponse.m */,
+				B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */,
+				B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */,
+				B54F1BA113CAD70600F9F874 /* CouchDBSyncerStorePolicy.h */,
+				B54F1BA213CAD70600F9F874 /* CouchDBSyncerStorePolicy.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		B54F1BCB13CAD76000F9F874 /* json-framework */ = {
+			isa = PBXGroup;
+			children = (
+				B54F1BCC13CAD76000F9F874 /* NSObject+SBJson.h */,
+				B54F1BCD13CAD76000F9F874 /* NSObject+SBJson.m */,
+				B54F1BCE13CAD76000F9F874 /* SBJson.h */,
+				B54F1BCF13CAD76000F9F874 /* SBJsonParser.h */,
+				B54F1BD013CAD76000F9F874 /* SBJsonParser.m */,
+				B54F1BD113CAD76000F9F874 /* SBJsonStreamParser.h */,
+				B54F1BD213CAD76000F9F874 /* SBJsonStreamParser.m */,
+				B54F1BD313CAD76000F9F874 /* SBJsonStreamParserAccumulator.h */,
+				B54F1BD413CAD76000F9F874 /* SBJsonStreamParserAccumulator.m */,
+				B54F1BD513CAD76000F9F874 /* SBJsonStreamParserAdapter.h */,
+				B54F1BD613CAD76000F9F874 /* SBJsonStreamParserAdapter.m */,
+				B54F1BD713CAD76000F9F874 /* SBJsonStreamParserState.h */,
+				B54F1BD813CAD76000F9F874 /* SBJsonStreamParserState.m */,
+				B54F1BD913CAD76000F9F874 /* SBJsonStreamWriter.h */,
+				B54F1BDA13CAD76000F9F874 /* SBJsonStreamWriter.m */,
+				B54F1BDB13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.h */,
+				B54F1BDC13CAD76000F9F874 /* SBJsonStreamWriterAccumulator.m */,
+				B54F1BDD13CAD76000F9F874 /* SBJsonStreamWriterState.h */,
+				B54F1BDE13CAD76000F9F874 /* SBJsonStreamWriterState.m */,
+				B54F1BDF13CAD76000F9F874 /* SBJsonTokeniser.h */,
+				B54F1BE013CAD76000F9F874 /* SBJsonTokeniser.m */,
+				B54F1BE113CAD76000F9F874 /* SBJsonUTF8Stream.h */,
+				B54F1BE213CAD76000F9F874 /* SBJsonUTF8Stream.m */,
+				B54F1BE313CAD76000F9F874 /* SBJsonWriter.h */,
+				B54F1BE413CAD76000F9F874 /* SBJsonWriter.m */,
+			);
+			name = "json-framework";
+			path = "Frameworks/json-framework/Classes";
+			sourceTree = "<group>";
+		};
+		B55C282813CADC78000412E6 /* CouchDBSyncer-Test */ = {
+			isa = PBXGroup;
+			children = (
+				B55C28BA13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld */,
+				B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */,
+				B55C284313CADD17000412E6 /* TestAppDocListViewController.h */,
+				B55C284413CADD17000412E6 /* TestAppDocListViewController.m */,
+				B55C284513CADD17000412E6 /* TestAppDocViewController.h */,
+				B55C284613CADD17000412E6 /* TestAppDocViewController.m */,
+				B55C284713CADD17000412E6 /* TestAppDocViewController.xib */,
+				B55C284813CADD17000412E6 /* TestAppViewController.h */,
+				B55C284913CADD17000412E6 /* TestAppViewController.m */,
+				B55C284A13CADD17000412E6 /* TestAppViewController.xib */,
+				B55C283113CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.h */,
+				B55C283213CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m */,
+				B55C283413CADC78000412E6 /* MainWindow.xib */,
+				B55C282913CADC78000412E6 /* Supporting Files */,
+			);
+			path = "CouchDBSyncer-Test";
+			sourceTree = "<group>";
+		};
+		B55C282913CADC78000412E6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B55C282A13CADC78000412E6 /* CouchDBSyncer-Test-Info.plist */,
+				B55C282B13CADC78000412E6 /* InfoPlist.strings */,
+				B55C282E13CADC78000412E6 /* CouchDBSyncer-Test-Prefix.pch */,
+				B55C282F13CADC78000412E6 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		B54F1B7913CAD64000F9F874 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B54F1BAA13CAD70600F9F874 /* NSDataAdditions.h in Headers */,
+				B54F1BAC13CAD70600F9F874 /* CouchDBSyncer.h in Headers */,
+				B54F1BAF13CAD70600F9F874 /* CouchDBSyncerAttachment.h in Headers */,
+				B54F1BB113CAD70600F9F874 /* CouchDBSyncerBulkFetch.h in Headers */,
+				B54F1BB313CAD70600F9F874 /* CouchDBSyncerDebug.h in Headers */,
+				B54F1BB413CAD70600F9F874 /* CouchDBSyncerDelegate.h in Headers */,
+				B54F1BB513CAD70600F9F874 /* CouchDBSyncerDocument.h in Headers */,
+				B54F1BB713CAD70600F9F874 /* CouchDBSyncerError.h in Headers */,
+				B54F1BB913CAD70600F9F874 /* CouchDBSyncerFetch.h in Headers */,
+				B54F1BBB13CAD70600F9F874 /* CouchDBSyncerObject.h in Headers */,
+				B54F1BBD13CAD70600F9F874 /* CouchDBSyncerResponse.h in Headers */,
+				B54F1BBF13CAD70600F9F874 /* CouchDBSyncerStore.h in Headers */,
+				B54F1BC113CAD70600F9F874 /* CouchDBSyncerStorePolicy.h in Headers */,
+				B54F1BC313CAD70600F9F874 /* MOCouchDBSyncerAttachment.h in Headers */,
+				B54F1BC513CAD70600F9F874 /* MOCouchDBSyncerDatabase.h in Headers */,
+				B54F1BC713CAD70600F9F874 /* MOCouchDBSyncerDocument.h in Headers */,
+				B54F1BE513CAD76000F9F874 /* NSObject+SBJson.h in Headers */,
+				B54F1BE713CAD76000F9F874 /* SBJson.h in Headers */,
+				B54F1BE813CAD76000F9F874 /* SBJsonParser.h in Headers */,
+				B54F1BEA13CAD76000F9F874 /* SBJsonStreamParser.h in Headers */,
+				B54F1BEC13CAD76000F9F874 /* SBJsonStreamParserAccumulator.h in Headers */,
+				B54F1BEE13CAD76000F9F874 /* SBJsonStreamParserAdapter.h in Headers */,
+				B54F1BF013CAD76000F9F874 /* SBJsonStreamParserState.h in Headers */,
+				B54F1BF213CAD76000F9F874 /* SBJsonStreamWriter.h in Headers */,
+				B54F1BF413CAD76000F9F874 /* SBJsonStreamWriterAccumulator.h in Headers */,
+				B54F1BF613CAD76000F9F874 /* SBJsonStreamWriterState.h in Headers */,
+				B54F1BF813CAD76000F9F874 /* SBJsonTokeniser.h in Headers */,
+				B54F1BFA13CAD76000F9F874 /* SBJsonUTF8Stream.h in Headers */,
+				B54F1BFC13CAD76000F9F874 /* SBJsonWriter.h in Headers */,
+				B55C284D13CADD17000412E6 /* TestAppDocListViewController.h in Headers */,
+				B55C284F13CADD17000412E6 /* TestAppDocViewController.h in Headers */,
+				B55C285113CADD17000412E6 /* TestAppViewController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		B54F1B7A13CAD64000F9F874 /* CouchDBSyncer-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B54F1B8513CAD64000F9F874 /* Build configuration list for PBXNativeTarget "CouchDBSyncer-iOS" */;
+			buildPhases = (
+				B54F1B7713CAD64000F9F874 /* Sources */,
+				B54F1B7813CAD64000F9F874 /* Frameworks */,
+				B54F1B7913CAD64000F9F874 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CouchDBSyncer-iOS";
+			productName = "CouchDBSyncer-iOS";
+			productReference = B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		B55C282013CADC78000412E6 /* CouchDBSyncer-Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B55C283F13CADC78000412E6 /* Build configuration list for PBXNativeTarget "CouchDBSyncer-Test" */;
+			buildPhases = (
+				B55C281D13CADC78000412E6 /* Sources */,
+				B55C281E13CADC78000412E6 /* Frameworks */,
+				B55C281F13CADC78000412E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B55C286A13CADF08000412E6 /* PBXTargetDependency */,
+			);
+			name = "CouchDBSyncer-Test";
+			productName = "CouchDBSyncer-Test";
+			productReference = B55C282113CADC78000412E6 /* CouchDBSyncer-Test.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B54F1B7213CAD64000F9F874 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "2moro mobile";
+			};
+			buildConfigurationList = B54F1B7513CAD64000F9F874 /* Build configuration list for PBXProject "CouchDBSyncer-iOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B54F1B7013CAD64000F9F874;
+			productRefGroup = B54F1B7C13CAD64000F9F874 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B54F1B7A13CAD64000F9F874 /* CouchDBSyncer-iOS */,
+				B55C282013CADC78000412E6 /* CouchDBSyncer-Test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B55C281F13CADC78000412E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B55C282D13CADC78000412E6 /* InfoPlist.strings in Resources */,
+				B55C283613CADC78000412E6 /* MainWindow.xib in Resources */,
+				B55C285513CADE2E000412E6 /* TestAppDocViewController.xib in Resources */,
+				B55C285713CADE36000412E6 /* TestAppViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B54F1B7713CAD64000F9F874 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B54F1BAB13CAD70600F9F874 /* NSDataAdditions.m in Sources */,
+				B54F1BAD13CAD70600F9F874 /* CouchDBSyncer.m in Sources */,
+				B54F1BAE13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld in Sources */,
+				B54F1BB013CAD70600F9F874 /* CouchDBSyncerAttachment.m in Sources */,
+				B54F1BB213CAD70600F9F874 /* CouchDBSyncerBulkFetch.m in Sources */,
+				B54F1BB613CAD70600F9F874 /* CouchDBSyncerDocument.m in Sources */,
+				B54F1BB813CAD70600F9F874 /* CouchDBSyncerError.m in Sources */,
+				B54F1BBA13CAD70600F9F874 /* CouchDBSyncerFetch.m in Sources */,
+				B54F1BBC13CAD70600F9F874 /* CouchDBSyncerObject.m in Sources */,
+				B54F1BBE13CAD70600F9F874 /* CouchDBSyncerResponse.m in Sources */,
+				B54F1BC013CAD70600F9F874 /* CouchDBSyncerStore.m in Sources */,
+				B54F1BC213CAD70600F9F874 /* CouchDBSyncerStorePolicy.m in Sources */,
+				B54F1BC413CAD70600F9F874 /* MOCouchDBSyncerAttachment.m in Sources */,
+				B54F1BC613CAD70600F9F874 /* MOCouchDBSyncerDatabase.m in Sources */,
+				B54F1BC813CAD70600F9F874 /* MOCouchDBSyncerDocument.m in Sources */,
+				B54F1BE613CAD76000F9F874 /* NSObject+SBJson.m in Sources */,
+				B54F1BE913CAD76000F9F874 /* SBJsonParser.m in Sources */,
+				B54F1BEB13CAD76000F9F874 /* SBJsonStreamParser.m in Sources */,
+				B54F1BED13CAD76000F9F874 /* SBJsonStreamParserAccumulator.m in Sources */,
+				B54F1BEF13CAD76000F9F874 /* SBJsonStreamParserAdapter.m in Sources */,
+				B54F1BF113CAD76000F9F874 /* SBJsonStreamParserState.m in Sources */,
+				B54F1BF313CAD76000F9F874 /* SBJsonStreamWriter.m in Sources */,
+				B54F1BF513CAD76000F9F874 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				B54F1BF713CAD76000F9F874 /* SBJsonStreamWriterState.m in Sources */,
+				B54F1BF913CAD76000F9F874 /* SBJsonTokeniser.m in Sources */,
+				B54F1BFB13CAD76000F9F874 /* SBJsonUTF8Stream.m in Sources */,
+				B54F1BFD13CAD76000F9F874 /* SBJsonWriter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B55C281D13CADC78000412E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B55C28BC13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld in Sources */,
+				B55C283013CADC78000412E6 /* main.m in Sources */,
+				B55C283313CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m in Sources */,
+				B55C285313CADE25000412E6 /* TestAppDocListViewController.m in Sources */,
+				B55C285413CADE28000412E6 /* TestAppDocViewController.m in Sources */,
+				B55C285613CADE32000412E6 /* TestAppViewController.m in Sources */,
+				B55C286213CADE79000412E6 /* NSDataAdditions.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B55C286A13CADF08000412E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B54F1B7A13CAD64000F9F874 /* CouchDBSyncer-iOS */;
+			targetProxy = B55C286913CADF08000412E6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B55C282B13CADC78000412E6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B55C282C13CADC78000412E6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		B55C283413CADC78000412E6 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B55C283513CADC78000412E6 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		B54F1B8313CAD64000F9F874 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		B54F1B8413CAD64000F9F874 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		B54F1B8613CAD64000F9F874 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/CouchDBSyncer_iOS.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CouchDBSyncer-iOS/CouchDBSyncer-iOS-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B54F1B8713CAD64000F9F874 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/CouchDBSyncer_iOS.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CouchDBSyncer-iOS/CouchDBSyncer-iOS-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		B55C283D13CADC78000412E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CouchDBSyncer-Test/CouchDBSyncer-Test-Prefix.pch";
+				INFOPLIST_FILE = "CouchDBSyncer-Test/CouchDBSyncer-Test-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		B55C283E13CADC78000412E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CouchDBSyncer-Test/CouchDBSyncer-Test-Prefix.pch";
+				INFOPLIST_FILE = "CouchDBSyncer-Test/CouchDBSyncer-Test-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B54F1B7513CAD64000F9F874 /* Build configuration list for PBXProject "CouchDBSyncer-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B54F1B8313CAD64000F9F874 /* Debug */,
+				B54F1B8413CAD64000F9F874 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B54F1B8513CAD64000F9F874 /* Build configuration list for PBXNativeTarget "CouchDBSyncer-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B54F1B8613CAD64000F9F874 /* Debug */,
+				B54F1B8713CAD64000F9F874 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B55C283F13CADC78000412E6 /* Build configuration list for PBXNativeTarget "CouchDBSyncer-Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B55C283D13CADC78000412E6 /* Debug */,
+				B55C283E13CADC78000412E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		B54F1B8D13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B54F1B8E13CAD70600F9F874 /* CouchDBSyncer.xcdatamodel */,
+			);
+			currentVersion = B54F1B8E13CAD70600F9F874 /* CouchDBSyncer.xcdatamodel */;
+			name = CouchDBSyncer.xcdatamodeld;
+			path = ../CouchDBSyncer.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B55C28BA13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B55C28BB13CAE29F000412E6 /* CouchDBSyncer.xcdatamodel */,
+			);
+			currentVersion = B55C28BB13CAE29F000412E6 /* CouchDBSyncer.xcdatamodel */;
+			name = CouchDBSyncer.xcdatamodeld;
+			path = "../CouchDBSyncer-iOS/CouchDBSyncer.xcdatamodeld";
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = B54F1B7213CAD64000F9F874 /* Project object */;
+}
