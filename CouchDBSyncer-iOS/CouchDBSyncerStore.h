@@ -7,62 +7,74 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CouchDBSyncer.h"
 #import <CoreData/CoreData.h>
 #import "MOCouchDBSyncerDatabase.h"
 #import "MOCouchDBSyncerDocument.h"
 #import "MOCouchDBSyncerAttachment.h"
-#import "CouchDBSyncerStorePolicy.h"
+#import "CouchDBSyncerDownloadPolicy.h"
+#import "CouchDBSyncerDatabase.h"
+#import "CouchDBSyncerUpdateContext.h"
 
-@protocol CouchDBSyncerStoreDelegate;
-
-@interface CouchDBSyncerStore : NSObject <CouchDBSyncerDelegate> {
-    CouchDBSyncer *syncer;
-    NSString *name, *serverPath, *modelTypeKey;
+@interface CouchDBSyncerStore : NSObject {
+    NSString *modelTypeKey;
     
     // core data
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;	
+    NSPersistentStoreCoordinator *persistentStoreCoordinator;
     
     NSError *error;
-    
-    MOCouchDBSyncerDatabase *db;
-    NSObject<CouchDBSyncerStoreDelegate> *delegate;
+    NSString *shippedPath;
 }
 
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, retain) NSString *serverPath, *modelTypeKey;
-@property (nonatomic, retain) NSObject<CouchDBSyncerStoreDelegate> *delegate;
-@property (nonatomic, readonly) NSError *error;
-@property (nonatomic, readonly) CouchDBSyncer *syncer;
+@property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-- (id)initWithName:(NSString *)n serverPath:(NSString *)url delegate:(id)d;
+@property (nonatomic, retain) NSString *modelTypeKey;
+@property (nonatomic, retain) NSError *error;
 
-- (void)fetchChanges;
+- (id)initWithShippedDatabasePath:(NSString *)shippedPath;
+
+// purge the store (removes all databases)
 - (void)purge;
+
+// purge all data for the specified database
+- (void)purge:(CouchDBSyncerDatabase *)database;
+
+// remove the specified database completely
+- (void)destroy:(CouchDBSyncerDatabase *)database;
+
 - (NSDictionary *)statistics;
 
-- (NSArray *)documents;
-- (NSArray *)documentsMatching:(NSPredicate *)predicate;
-- (NSArray *)documentsOfType:(NSString *)type;
-- (NSArray *)documentsOfType:(NSString *)type tagged:(NSString *)tag;
-- (NSArray *)documentsTagged:(NSString *)tag;
+// get database with given name
+- (CouchDBSyncerDatabase *)database:(NSString *)name;
 
-@end
+// get database with the given name. if the database is not found locally, creates a new database with the 
+// given name and url.
+- (CouchDBSyncerDatabase *)database:(NSString *)name url:(NSURL *)url;
 
+// get documents
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database;
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database matching:(NSPredicate *)predicate;
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type tagged:(NSString *)tag;
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database tagged:(NSString *)tag;
 
-@protocol CouchDBSyncerStoreDelegate <NSObject>
+// get document types (array of NSString)
+- (NSArray *)documentTypes:(CouchDBSyncerDatabase *)database;
 
-- (void)couchDBSyncerStoreProgress:(CouchDBSyncerStore *)store;
-- (void)couchDBSyncerStoreCompleted:(CouchDBSyncerStore *)store;
-- (void)couchDBSyncerStoreFailed:(CouchDBSyncerStore *)store;
+// get all attachments from a document
+- (NSArray *)attachments:(CouchDBSyncerDocument *)document;
 
-@optional
+// get attachment
+- (CouchDBSyncerAttachment *)atachment:(CouchDBSyncerDocument *)document named:(NSString *)name;
 
-- (void)couchDBSyncerStore:(CouchDBSyncerStore *)store document:(CouchDBSyncerDocument *)doc policy:(CouchDBSyncerStorePolicy *)policy;
-- (void)couchDBSyncerStore:(CouchDBSyncerStore *)store attachment:(CouchDBSyncerAttachment *)att policy:(CouchDBSyncerStorePolicy *)policy;
-
-- (void)couchDBSyncerStore:(CouchDBSyncerStore *)store willReplaceDatabase:(NSString *)path;
+// update methods
+// used by couchdbsyncer
+// get an update context for the given database and current thread
+- (CouchDBSyncerUpdateContext *)updateContext:(CouchDBSyncerDatabase *)database;
+- (void)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document;
+- (void)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment;
 
 @end

@@ -16,15 +16,18 @@
 
 @implementation CouchDBSyncerBulkFetch
 
-- (id)initWithServerPath:(NSString *)path delegate:(id<CouchDBSyncerFetchDelegate>)d {
-    NSString *urlPath = [NSString stringWithFormat:@"%@/_all_docs?include_docs=true", path];
+- (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d {
+    NSString *urlPath = [NSString stringWithFormat:@"%@/_all_docs?include_docs=true", u];
     if((self = [super initWithURL:[NSURL URLWithString:urlPath] delegate:d])) {
         fetchType = CouchDBSyncerFetchTypeBulkDocuments;
+        documents = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (void)dealloc {
+    [documents release];
+    
     [super dealloc];
 }
 
@@ -36,7 +39,7 @@
 
 - (NSString *)httpBody {
     NSMutableArray *keys = [NSMutableArray array];
-    for(CouchDBSyncerDocument *doc in response.objects) {
+    for(CouchDBSyncerDocument *doc in documents) {
         [keys addObject:doc.documentId];
     }
     NSDictionary *req = [NSDictionary dictionaryWithObjectsAndKeys:keys, @"keys", nil];
@@ -59,16 +62,16 @@
 #pragma mark -
 
 - (void)addDocument:(CouchDBSyncerDocument *)doc {
-    [response addObject:doc];
+    [documents addObject:doc];
 }
 
 - (int)documentCount {
-    return [response.objects count];
+    return [documents count];
 }
 
 #pragma mark Private methods
 
-// update the content of the documents list from fetched data
+// update the content of the documents from the fetched data
 - (void)updateContent {
     NSDictionary *dict = [self dictionary];
     NSArray *rows = [dict valueForKey:@"rows"];
@@ -81,7 +84,7 @@
     }
     
     // update document content
-    for(CouchDBSyncerDocument *doc in response.objects) {
+    for(CouchDBSyncerDocument *doc in documents) {
         doc.dictionary = [docById valueForKey:doc.documentId];
     }
 }

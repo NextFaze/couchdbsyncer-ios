@@ -8,16 +8,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "CouchDBSyncerDelegate.h"
 #import "CouchDBSyncerDocument.h"
 #import "CouchDBSyncerFetch.h"
 #import "CouchDBSyncerAttachment.h"
 #import "CouchDBSyncerBulkFetch.h"
+#import "CouchDBSyncerStore.h"
+#import "CouchDBSyncerDatabase.h"
+#import "CouchDBSyncerDownloadPolicy.h"
 
-@interface CouchDBSyncer : NSObject <CouchDBSyncerFetchDelegate,CouchDBSyncerResponseDelegate> {
-    NSString *serverPath;
-    int sequenceId;
-    id<CouchDBSyncerDelegate> delegate;
+@interface CouchDBSyncer : NSObject <CouchDBSyncerFetchDelegate> {
+    NSObject<CouchDBSyncerDownloadPolicy> *downloadPolicy;
+    CouchDBSyncerDatabase *database;
+    CouchDBSyncerStore *store;
+    
     NSThread *fetchThread;
     CouchDBSyncerFetch *changeFetcher;
     NSOperationQueue *responseQueue;    // queue of responses, returns responses in ascending sequence id order
@@ -38,27 +41,15 @@
     int bytes, bytesDoc, bytesAtt;
 }
 
-@property (nonatomic, retain) NSString *serverPath;
-@property (nonatomic, assign) int sequenceId;
-@property (nonatomic, assign) id<CouchDBSyncerDelegate> delegate;
 @property (nonatomic, readonly) int bytes, bytesDoc, bytesAtt, countReq, countFin, countHttpFin;
 @property (nonatomic, assign) int docsPerRequest, maxConcurrentFetches;
 @property (nonatomic, readonly) NSDate *startedAt;
+@property (nonatomic, retain) NSObject<CouchDBSyncerDownloadPolicy> *downloadPolicy;
 
-- (id)initWithServerPath:(NSString *)path delegate:(id<CouchDBSyncerDelegate>)d;
+- (id)initWithStore:(CouchDBSyncerStore *)store database:(CouchDBSyncerDatabase *)database;
 
-- (void)fetchChanges;
-- (void)fetchChangesSince:(int)sid;
+- (void)update;
 - (void)abort;  // abort fetch
-
-// fetches document / attachments (adds to fetch queue)
-- (void)fetchAttachment:(CouchDBSyncerAttachment *)attachment priority:(NSOperationQueuePriority)priority;
-- (void)fetchAttachment:(CouchDBSyncerAttachment *)attachment;
-- (void)fetchDocument:(CouchDBSyncerDocument *)doc priority:(NSOperationQueuePriority)priority;
-- (void)fetchDocument:(CouchDBSyncerDocument *)doc;
-
-// fetch database information
-- (void)fetchDatabaseInformation;
 
 // progress reporting
 - (float)progress;

@@ -19,7 +19,7 @@
 
 @implementation CouchDBSyncerStore
 
-@synthesize name, delegate, error, syncer, modelTypeKey;
+@synthesize error, modelTypeKey;
 
 #pragma mark -
 
@@ -33,50 +33,28 @@
     // set up core data
     [self managedObjectContext];
     if(managedObjectContext == nil) return;  // error with core data
-    
-    // fetch or create server record
-    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:name, @"NAME", nil];
-    NSError *err = nil;
-    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"databaseByName" substitutionVariables:data];
-    NSArray *databases = [managedObjectContext executeFetchRequest:fetch error:&err];
-    db = databases.count ? [[databases objectAtIndex:0] retain] : nil;
-    
-    if(db == nil) {
-        // add server record
-        db = [[NSEntityDescription insertNewObjectForEntityForName:@"Database" inManagedObjectContext:managedObjectContext] retain];
-        db.name = name;
-        db.url = serverPath;
-        db.sequenceId = 0;
-        [self saveDatabase];
-    }
-    
-    syncer.sequenceId = [db.sequenceId intValue];    
 }
 
 #pragma mark -
 
-- (id)initWithName:(NSString *)n serverPath:(NSString *)url delegate:(id)d {
-    if((self = [super init])) {
-        name = [n retain];
-        delegate = d;
-        serverPath = [url retain];
-        
-        // initialise syncer 
-        syncer = [[CouchDBSyncer alloc] initWithServerPath:url delegate:self];
+- (id)initWithShippedDatabasePath:(NSString *)path {
+    self = [super init];
+    if(self) {
         self.modelTypeKey = DefaultModelTypeKey;
-        
-        [self initDB];
+        shippedPath = [path retain];
+        [self initDB];        
     }
-    
+    return self;
+}
+
+- (id)init {
+    self = [self initWithShippedDatabasePath:nil];
     return self;
 }
 
 - (void)dealloc {
-    [name release];
-    [serverPath release];
-    [db release];
+    [shippedPath release];
     [error release];
-    [syncer release];
     [modelTypeKey release];
     
     [super dealloc];
@@ -84,56 +62,116 @@
 
 #pragma mark Accessors
 
-- (NSString *)serverPath {
-    return serverPath;
-}
-
-- (void)setServerPath:(NSString *)s {
-    if(s != serverPath) {
-        [serverPath release];
-        serverPath = [s retain];
-        syncer.serverPath = s;
-    }
-}
-
-#pragma mark -
 
 // save database
 - (BOOL)saveDatabase {
     NSError *err = nil;
     if (![managedObjectContext save:&err]) {
         LOG(@"error: %@, %@", err, [err userInfo]);
-        [error release];
-        error = [err retain];
-        
-        [syncer abort];
-        [delegate couchDBSyncerStoreFailed:self];
+        self.error = err;
     }
     return err ? NO : YES;
 }
 
-// save database and set sequence id
-- (void)saveDatabase:(int)sequenceId {
-    int origSequenceId = syncer.sequenceId;
-    
-    // attempt database save
-    db.sequenceId = [NSNumber numberWithInt:sequenceId];
-    syncer.sequenceId = sequenceId;
-    if(![self saveDatabase]) {
-        // save failed, revert to previous sequence id
-        db.sequenceId = [NSNumber numberWithInt:origSequenceId];
-        syncer.sequenceId = origSequenceId;
-    }
+#pragma mark -
+#pragma mark Conversion to/from managed objects
+
+- (CouchDBSyncerDatabase *)databaseObject:(MOCouchDBSyncerDatabase *)moDatabase {
+    CouchDBSyncerDatabase *database = [[[CouchDBSyncerDatabase alloc] init] autorelease];
+    return database;
 }
 
-- (void)reportError {
-    [delegate performSelectorOnMainThread:@selector(couchDBSyncerStoreFailed:) withObject:self waitUntilDone:YES];
+- (CouchDBSyncerDocument *)documentObject:(MOCouchDBSyncerDocument *)moDocument {
+    CouchDBSyncerDocument *doc = [[CouchDBSyncerDocument alloc] initWithDocumentId:moDocument.documentId revision:moDocument.revision sequenceId:0 deleted:NO];
+    return doc;
+}
+
+// return a CouchDBSyncerAttachment object corresponding to the managed object
+// (used for re-downloading unfetched attachments)
+- (CouchDBSyncerAttachment *)attachmentObject:(MOCouchDBSyncerAttachment *)attachment {
+    
+    CouchDBSyncerAttachment *att = [[[CouchDBSyncerAttachment alloc] init] autorelease];
+    CouchDBSyncerDocument *doc = [self documentObject:attachment.document];
+    
+    att.filename = attachment.filename;
+    att.contentType = attachment.contentType;
+    att.documentId = attachment.documentId;
+    att.length = [attachment.length intValue];
+    att.revpos = [attachment.revpos intValue];
+    att.deleted = NO;
+    att.document = doc;
+    
+    // don't need the content as this object is only used for fetch requests currently
+    //att.content = attachment.content;
+    
+    return att;
+}
+
+- (MOCouchDBSyncerDatabase *)moDatabaseObjectName:(NSString *)name {
+    NSError *err = nil;
+    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:name, @"NAME", nil];
+    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"databaseByName" substitutionVariables:data];
+    NSArray *databases = [managedObjectContext executeFetchRequest:fetch error:&err];
+    MOCouchDBSyncerDatabase *db = databases.count ? [[databases objectAtIndex:0] retain] : nil;
+    return db;
+}
+
+- (MOCouchDBSyncerDatabase *)moDatabaseObject:(CouchDBSyncerDatabase *)database {
+    return [self moDatabaseObjectName:database.name];
+}
+
+// return the managed object document for the given document
+- (MOCouchDBSyncerDocument *)moDocumentObject:(CouchDBSyncerDocument *)doc {
+    NSError *err = nil;
+    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:doc.documentId, @"DOCUMENT_ID", nil];
+    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"documentById" substitutionVariables:data];
+    NSArray *documents = [managedObjectContext executeFetchRequest:fetch error:&err];
+    return documents.count ? [documents objectAtIndex:0] : nil;	
+}
+
+// return the managed object attachment for the given attachment
+- (MOCouchDBSyncerAttachment *)moAttachmentObject:(CouchDBSyncerAttachment *)att {
+    NSError *err = nil;
+    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:att.documentId, @"DOCUMENT_ID", att.filename, @"FILENAME", nil];
+    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"attachmentByDocumentIdAndFilename" substitutionVariables:data];
+    NSArray *attachments = [managedObjectContext executeFetchRequest:fetch error:&err];
+    return attachments.count ? [attachments objectAtIndex:0] : nil;	
 }
 
 #pragma mark -
 
--(void)fetchChanges {
-    [syncer fetchDatabaseInformation];  // detect if database has been deleted since last fetch - purge all local data in that case.
+// get database with the given name. if the database is not found locally, creates a new database with the 
+// given name and url.
+- (CouchDBSyncerDatabase *)database:(NSString *)name url:(NSURL *)url {
+    // fetch or create database record
+    MOCouchDBSyncerDatabase *db = [self moDatabaseObjectName:name];
+    
+    if(db == nil) {
+        // add database record
+        db = [NSEntityDescription insertNewObjectForEntityForName:@"Database" inManagedObjectContext:managedObjectContext];
+        db.name = name;
+        db.url = [url absoluteString];
+        db.sequenceId = 0;
+
+        [self saveDatabase];
+    }
+    
+    return [self databaseObject:db];
+}
+
+// remove the specified database completely
+- (void)destroy:(CouchDBSyncerDatabase *)database {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    [managedObjectContext deleteObject:moDatabase];
+}
+
+// purge all data for the specified database
+- (void)purge:(CouchDBSyncerDatabase *)database {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    for(MOCouchDBSyncerDocument *moDocument in moDatabase.documents) {
+        [managedObjectContext deleteObject:moDocument];
+    }
+    [self saveDatabase];
 }
 
 // purge this store
@@ -142,11 +180,14 @@
         [self performSelectorOnMainThread:@selector(purge) withObject:nil waitUntilDone:YES];
         return;
     }
-    LOG(@"purging content for %@", name);
-    for(MOCouchDBSyncerDocument *doc in db.documents) {
-        [managedObjectContext deleteObject:doc];
+    LOG(@"purging all content");
+    
+    NSArray *databases = nil;  // TODO: select all databases
+    
+    for(MOCouchDBSyncerDatabase *moDatabase in databases) {
+        [managedObjectContext deleteObject:moDatabase];
     }
-    [self saveDatabase:0];
+    [self saveDatabase];
 }
 
 - (int)countForEntityName:(NSString *)entityName {
@@ -166,14 +207,17 @@
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt:attachments], @"attachments",
             [NSNumber numberWithInt:docs], @"documents",
-            db.sequenceId, @"sequenceId",
-            [NSNumber numberWithInt:syncer.bytes], @"bytes transferred",
-            [NSNumber numberWithInt:syncer.countHttpFin], @"HTTP requests",
             nil];
 }
 
-- (NSArray *)documents {
-    return [db.documents allObjects];
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSMutableArray *documents = [NSMutableArray array];
+    for(MOCouchDBSyncerDocument *moDocument in moDatabase.documents) {
+        CouchDBSyncerDocument *document = [self documentObject:moDocument];
+        [documents addObject:document];
+    }
+    return documents;
 }
 
 - (NSArray *)documentsMatching:(NSPredicate *)predicate {	
@@ -181,10 +225,16 @@
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:[NSEntityDescription entityForName:@"Document" inManagedObjectContext:managedObjectContext]];
     [request setPredicate:predicate];
-    NSArray *ret = [managedObjectContext executeFetchRequest:request error:&err];
+    NSArray *moDocuments = [managedObjectContext executeFetchRequest:request error:&err];
     [request release];
     
-    return ret;
+    NSMutableArray *documents = [NSMutableArray array];
+    for(MOCouchDBSyncerDocument *moDocument in moDocuments) {
+        CouchDBSyncerDocument *document = [self documentObject:moDocument];
+        [documents addObject:document];
+    }
+    
+    return documents;
 }
 
 - (NSArray *)documentsOfType:(NSString *)type {
@@ -240,7 +290,7 @@
     if (persistentStoreCoordinator != nil) return persistentStoreCoordinator;
     
     NSError *err = nil;
-    NSString *dbfile = [NSString stringWithFormat:@"%@.sqlite", name];
+    NSString *dbfile = [NSString stringWithFormat:@"couchdbsyncer.sqlite"];
     NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] stringByAppendingPathComponent:dbfile]];	
     
     // handle db upgrade
@@ -252,9 +302,11 @@
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:storeUrl.path]) {
         // database doesn't exist.
-        // inform delegate that the database is about to be created - it can install its own database here if required
-        if([delegate respondsToSelector:@selector(couchDBSyncerStore:willReplaceDatabase:)])
-            [delegate couchDBSyncerStore:self willReplaceDatabase:storeUrl.path];
+        // install shipped database if provided
+        if(shippedPath) {
+            LOG(@"installing shipped database");
+            [[NSFileManager defaultManager] copyItemAtPath:shippedPath toPath:storeUrl.path error:&err];
+        }
     }
     
     // iteration 0: on failure, delete database, notify delegate  (delegate may install its own database here)
@@ -270,17 +322,16 @@
 
             options = nil;
  
-            if(i == 0) {
-                // give the delegate a chance to do something after the first failure
-                if([delegate respondsToSelector:@selector(couchDBSyncerStore:willReplaceDatabase:)])
-                    [delegate couchDBSyncerStore:self willReplaceDatabase:storeUrl.path];
+            if(i == 0 && shippedPath) {
+                // install shipped database
+                LOG(@"installing shipped database");
+                [[NSFileManager defaultManager] copyItemAtPath:shippedPath toPath:storeUrl.path error:&err];
             }
             else if(i == 2) {
                 // unrecoverable error
                 LOG(@"persistent store error: %@", err);
-                [error release];
-                error = [[CouchDBSyncerError errorWithCode:CouchDBSyncerErrorStore] retain];
-                [self reportError];
+                self.error = [CouchDBSyncerError errorWithCode:CouchDBSyncerErrorStore];
+                //[self reportError];
             }
         } else {
             // no error
@@ -309,61 +360,7 @@
     return managedObjectContext;
 }
 
-/*
- - (void)mainThreadDatabaseMerge:(NSNotification*)notification {
- [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
- }
- - (void)managedObjectContextChanges:(NSNotification*)notification {
- [self performSelectorOnMainThread:@selector(mainThreadDatabaseMerge:) withObject:notification waitUntilDone:YES];
- }
- */
-
-// return the managed object document for the given document
-- (MOCouchDBSyncerDocument *)managedObjectDocument:(CouchDBSyncerDocument *)doc {
-    NSError *err = nil;
-    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:doc.documentId, @"DOCUMENT_ID", nil];
-    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"documentById" substitutionVariables:data];
-    NSArray *documents = [managedObjectContext executeFetchRequest:fetch error:&err];
-    return documents.count ? [documents objectAtIndex:0] : nil;	
-}
-
-// return the managed object attachment for the given attachment
-- (MOCouchDBSyncerAttachment *)managedObjectAttachment:(CouchDBSyncerAttachment *)att {
-    NSError *err = nil;
-    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:att.documentId, @"DOCUMENT_ID", att.filename, @"FILENAME", nil];
-    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"attachmentByDocumentIdAndFilename" substitutionVariables:data];
-    NSArray *attachments = [managedObjectContext executeFetchRequest:fetch error:&err];
-    return attachments.count ? [attachments objectAtIndex:0] : nil;	
-}
-
-- (CouchDBSyncerDocument *)documentFromManagedObject:(MOCouchDBSyncerDocument *)document {
-    CouchDBSyncerDocument *doc = [[CouchDBSyncerDocument alloc] initWithDocumentId:document.documentId revision:document.revision sequenceId:0 deleted:NO];
-    // doc.sequenceId
-    // doc.attachments
-    
-    return [doc autorelease];
-}
-
-// return a CouchDBSyncerAttachment object corresponding to the managed object
-// (used for re-downloading unfetched attachments)
-- (CouchDBSyncerAttachment *)attachmentFromManagedObject:(MOCouchDBSyncerAttachment *)attachment {
-
-    CouchDBSyncerAttachment *att = [[CouchDBSyncerAttachment alloc] init];
-    CouchDBSyncerDocument *doc = [self documentFromManagedObject:attachment.document];
-    
-    att.filename = attachment.filename;
-    att.contentType = attachment.contentType;
-    att.documentId = attachment.documentId;
-    att.length = [attachment.length intValue];
-    att.revpos = [attachment.revpos intValue];
-    att.deleted = NO;
-    att.document = doc;
-
-    // don't need the content as this object is only used for fetch requests currently
-    //att.content = attachment.content;
-
-    return [att autorelease];
-}
+#pragma mark -
 
 // returns all MOCouchDBSyncerAttachment objects that haven't been fetched yet
 - (NSArray *)unfetchedAttachments {
@@ -371,6 +368,7 @@
     return [managedObjectContext executeFetchRequest:fetch error:nil];
 }
 
+/*
 // downloads the given attachment list
 - (void)downloadAttachments:(NSArray *)attachments {
     CouchDBSyncerStorePolicy *policy = [[CouchDBSyncerStorePolicy alloc] init];
@@ -386,24 +384,135 @@
     [policy release];
 }
 
+ */
+
 #pragma mark CouchDBSyncerDelegate handlers (to be run on main thread)
 
+/*
 - (void)syncerFoundDeletedDocument:(CouchDBSyncerDocument *)doc {
-    LOG(@"removing document: %@ (seq %d)", doc, doc.sequenceId);
-    
-    // delete document & attachments
-    MOCouchDBSyncerDocument *document = [self managedObjectDocument:doc];
-    if(document) {
-        [managedObjectContext deleteObject:document];
-    }
-    
-    // save database (updates sequence id)
-    [self saveDatabase:doc.sequenceId];
+
 }
 
-- (void)syncerDidFetchDocument:(CouchDBSyncerDocument *)doc {
+- (void)syncerDidFetchDatabaseInformation:(NSDictionary *)info {
+    LOG(@"database info: %@", info);
     
-    LOG(@"fetched document: %@ (seq %d)", doc, doc.sequenceId);
+    int docDelCount = [[info valueForKey:@"doc_del_count"] intValue];
+    int docUpdateSeq = [[info valueForKey:@"doc_update_seq"] intValue];
+    NSString *dbName = [info valueForKey:@"db_name"];
+    
+    if(docDelCount < [db.docDelCount intValue] || docUpdateSeq < [db.docUpdateSeq intValue]) {
+        LOG(@"lower deletion or update sequence count on server - removing local store");
+        [self purge];
+    }
+    else if(dbName && ![db.dbName isEqualToString:dbName]) {
+        LOG(@"database name changed - removing local store");
+        [self purge];
+    }
+    db.dbName = dbName;
+    db.docDelCount = [NSNumber numberWithInt:docDelCount];
+    db.docUpdateSeq = [NSNumber numberWithInt:docUpdateSeq];
+    
+    [self saveDatabase];  // save database without updating sequence
+    
+    // continue with sync
+    [syncer fetchChanges];
+}
+ */
+
+/*
+#pragma mark CouchDBSyncerDelegate
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchChanges:(NSArray *)changes {
+    LOG(@"fetched changelist: %d items", [changes count]);
+    CouchDBSyncerStorePolicy *policy = [[CouchDBSyncerStorePolicy alloc] init];
+    
+    // download changed documents
+    for(CouchDBSyncerDocument *doc in changes) {
+        policy.download = [doc isDesignDocument] ? NO : YES;
+        policy.priority = NSOperationQueuePriorityNormal;
+        
+        if([delegate respondsToSelector:@selector(couchDBSyncerStore:document:policy:)])
+            [delegate couchDBSyncerStore:self document:doc policy:policy];
+        
+        if(policy.download)
+            [syncer fetchDocument:doc priority:policy.priority];
+    }
+    
+    [policy release];
+    
+    // download unfetched attachments.
+    // need to convert managed objects to CouchDBSyncerAttachments first
+    NSArray *unfetchedAttachments = [self unfetchedAttachments];
+    NSMutableArray *list = [NSMutableArray array];
+    for(MOCouchDBSyncerAttachment *attachment in unfetchedAttachments) {
+        [list addObject:[self attachmentFromManagedObject:attachment]];
+    }
+    if([list count] > 0) {
+        LOG(@"downloading %d unfetched attachments", [list count]);
+        [self downloadAttachments:list];
+    }
+}
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFindDeletedDocument:(CouchDBSyncerDocument *)doc {
+    [self performSelectorOnMainThread:@selector(syncerFoundDeletedDocument:) withObject:doc waitUntilDone:YES];
+}
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchDocument:(CouchDBSyncerDocument *)doc {
+    [self performSelectorOnMainThread:@selector(syncerDidFetchDocument:) withObject:doc waitUntilDone:YES];
+}
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchAttachment:(CouchDBSyncerAttachment *)att {
+    [self performSelectorOnMainThread:@selector(syncerDidFetchAttachment:) withObject:att waitUntilDone:YES];
+}
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchDatabaseInformation:(NSDictionary *)info {
+    [self performSelectorOnMainThread:@selector(syncerDidFetchDatabaseInformation:) withObject:info waitUntilDone:YES];
+}
+
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFailWithError:(NSError *)err {	
+    LOG(@"error: %@", err);
+    if(err != error) {
+        [error release];
+        error = [err retain];
+    }
+    [self reportError];
+}
+
+ */
+
+#pragma mark -
+#pragma mark Syncer support
+
+// update methods
+// used by couchdbsyncer
+// get an update context for the given database and current thread
+- (CouchDBSyncerUpdateContext *)updateContext:(CouchDBSyncerDatabase *)database {
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+    [moc setPersistentStoreCoordinator:self.persistentStoreCoordinator];    
+    CouchDBSyncerUpdateContext *context = [[[CouchDBSyncerUpdateContext alloc] initWithContext:moc database:database] autorelease];
+    [moc release];
+    
+    return context;
+}
+
+- (void)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document {
+    MOCouchDBSyncerDatabase *moDatabase = context.moDatabase;
+    
+    LOG(@"document: %@ (seq %d)", doc, doc.sequenceId);
+    
+    if(document.deleted) {
+        LOG(@"removing document: %@ (seq %d)", doc, doc.sequenceId);
+        
+        // delete document & attachments
+        MOCouchDBSyncerDocument *document = [self managedObjectDocument:doc];
+        if(document) {
+            [managedObjectContext deleteObject:document];
+        }
+        
+        // save database (updates sequence id)
+        [self saveDatabase];
+        return;
+    }
     
     // save document
     // add/update server record
@@ -470,119 +579,27 @@
     // download attachments. 
     // at this point attachment metadata should be saved in the database.
     LOG(@"new attachments: %d", [new count]);
-    [self downloadAttachments:[new allObjects]];
-    
+    //[self downloadAttachments:[new allObjects]];
+
 }
 
-- (void)syncerDidFetchAttachment:(CouchDBSyncerAttachment *)att {
-    LOG(@"fetched attachment: %@", att);
+- (void)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment {
+    LOG(@"attachment: %@", attachment);
     
-    MOCouchDBSyncerAttachment *attachment = [self managedObjectAttachment:att];
-    if(attachment == nil) {
+    MOCouchDBSyncerAttachment *moAttachment = [self moAttachmentObject:attachment];
+    if(moAttachment == nil) {
         // attachment record should be in the database (added by didFetchDocument)
-        LOG(@"internal error: no attachment record found for %@", att);
+        LOG(@"internal error: no attachment record found for %@", attachment);
         return;
     }
     
-    attachment.content = att.content;
-    attachment.length = [NSNumber numberWithInt:[att.content length]];
-    attachment.unfetchedChanges = [NSNumber numberWithBool:NO];
-    attachment.revpos = [NSNumber numberWithInt:att.revpos];
+    moAttachment.content = attachment.content;
+    moAttachment.length = [NSNumber numberWithInt:[attachment.content length]];
+    moAttachment.unfetchedChanges = [NSNumber numberWithBool:NO];
+    moAttachment.revpos = [NSNumber numberWithInt:attachment.revpos];
     
-    // save database (doesn't update sequence)
+    // save database 
     [self saveDatabase];
-}
-
-- (void)syncerDidFetchDatabaseInformation:(NSDictionary *)info {
-    LOG(@"database info: %@", info);
-    
-    int docDelCount = [[info valueForKey:@"doc_del_count"] intValue];
-    int docUpdateSeq = [[info valueForKey:@"doc_update_seq"] intValue];
-    NSString *dbName = [info valueForKey:@"db_name"];
-    
-    if(docDelCount < [db.docDelCount intValue] || docUpdateSeq < [db.docUpdateSeq intValue]) {
-        LOG(@"lower deletion or update sequence count on server - removing local store");
-        [self purge];
-    }
-    else if(dbName && ![db.dbName isEqualToString:dbName]) {
-        LOG(@"database name changed - removing local store");
-        [self purge];
-    }
-    db.dbName = dbName;
-    db.docDelCount = [NSNumber numberWithInt:docDelCount];
-    db.docUpdateSeq = [NSNumber numberWithInt:docUpdateSeq];
-    
-    [self saveDatabase];  // save database without updating sequence
-    
-    // continue with sync
-    [syncer fetchChanges];
-}
-
-#pragma mark CouchDBSyncerDelegate
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchChanges:(NSArray *)changes {
-    LOG(@"fetched changelist: %d items", [changes count]);
-    CouchDBSyncerStorePolicy *policy = [[CouchDBSyncerStorePolicy alloc] init];
-    
-    // download changed documents
-    for(CouchDBSyncerDocument *doc in changes) {
-        policy.download = [doc isDesignDocument] ? NO : YES;
-        policy.priority = NSOperationQueuePriorityNormal;
-        
-        if([delegate respondsToSelector:@selector(couchDBSyncerStore:document:policy:)])
-            [delegate couchDBSyncerStore:self document:doc policy:policy];
-        
-        if(policy.download)
-            [syncer fetchDocument:doc priority:policy.priority];
-    }
-    
-    [policy release];
-    
-    // download unfetched attachments.
-    // need to convert managed objects to CouchDBSyncerAttachments first
-    NSArray *unfetchedAttachments = [self unfetchedAttachments];
-    NSMutableArray *list = [NSMutableArray array];
-    for(MOCouchDBSyncerAttachment *attachment in unfetchedAttachments) {
-        [list addObject:[self attachmentFromManagedObject:attachment]];
-    }
-    if([list count] > 0) {
-        LOG(@"downloading %d unfetched attachments", [list count]);
-        [self downloadAttachments:list];
-    }
-}
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFindDeletedDocument:(CouchDBSyncerDocument *)doc {
-    [self performSelectorOnMainThread:@selector(syncerFoundDeletedDocument:) withObject:doc waitUntilDone:YES];
-}
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchDocument:(CouchDBSyncerDocument *)doc {
-    [self performSelectorOnMainThread:@selector(syncerDidFetchDocument:) withObject:doc waitUntilDone:YES];
-}
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchAttachment:(CouchDBSyncerAttachment *)att {
-    [self performSelectorOnMainThread:@selector(syncerDidFetchAttachment:) withObject:att waitUntilDone:YES];
-}
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchDatabaseInformation:(NSDictionary *)info {
-    [self performSelectorOnMainThread:@selector(syncerDidFetchDatabaseInformation:) withObject:info waitUntilDone:YES];
-}
-
-- (void)couchDBSyncer:(CouchDBSyncer *)s didFailWithError:(NSError *)err {	
-    LOG(@"error: %@", err);
-    if(err != error) {
-        [error release];
-        error = [err retain];
-    }
-    [self reportError];
-}
-
-- (void)couchDBSyncerProgress:(CouchDBSyncer *)s {
-    [delegate performSelectorOnMainThread:@selector(couchDBSyncerStoreProgress:) withObject:self waitUntilDone:YES];
-}
-
-- (void)couchDBSyncerCompleted:(CouchDBSyncer *)s {
-    LOG(@"finished");
-    [delegate performSelectorOnMainThread:@selector(couchDBSyncerStoreCompleted:) withObject:self waitUntilDone:YES];
 }
 
 @end

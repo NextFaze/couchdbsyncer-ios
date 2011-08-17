@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CouchDBSyncerDelegate.h"
 #import "CouchDBSyncerObject.h"
 
 @interface CouchDBSyncerDocument : CouchDBSyncerObject {

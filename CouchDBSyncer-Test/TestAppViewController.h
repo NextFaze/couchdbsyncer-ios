@@ -8,15 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import "CouchDBSyncerStore.h"
+#import "CouchDBSyncer.h"
 
-@interface TestAppViewController : UIViewController <CouchDBSyncerStoreDelegate, UITextFieldDelegate> {
-	CouchDBSyncerStore *store;
-	
+@interface TestAppViewController : UIViewController <UITextFieldDelegate> {	
 	UITextField *tfServer, *tfDocsPerReq;
 	UIButton *buttonSync, *buttonReset, *buttonDocs;
 	UILabel *labelStatus, *labelDocs;
 	UIProgressView *progressView1, *progressView2, *progressView3;
+
+    CouchDBSyncer *syncer;
 }
+
+@property (nonatomic, retain) CouchDBSyncer *syncer;
 
 @property (nonatomic, retain) IBOutlet UILabel *labelStatus, *labelDocs;
 @property (nonatomic, retain) IBOutlet UIButton *buttonSync, *buttonReset, *buttonDocs;

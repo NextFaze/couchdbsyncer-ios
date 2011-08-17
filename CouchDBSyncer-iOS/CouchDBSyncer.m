@@ -7,7 +7,6 @@
 //
 
 #import "CouchDBSyncer.h"
-#import "CouchDBSyncerResponse.h"
 #import "NSObject+SBJson.h"
 #import "CouchDBSyncerObject.h"
 
@@ -16,60 +15,18 @@
 
 @implementation CouchDBSyncer
 
-@synthesize delegate, sequenceId, serverPath, docsPerRequest;
+@synthesize docsPerRequest;
+@synthesize downloadPolicy;
 
 // readonly
 @synthesize countReq, countFin, countHttpFin, bytes, bytesDoc, bytesAtt;
 @synthesize startedAt;
 
-#pragma mark Private
-
-- (NSString *)urlEncodeValue:(NSString *)str {
-    NSString *result = (NSString *) CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)str, NULL,
-                                                                            CFSTR(":/?#[]@!$&’()*+,;="), kCFStringEncodingUTF8);
-    return [result autorelease];
-}
-
-// add a fetch response to the response queue
-- (CouchDBSyncerResponse *)fetcherResponse:(CouchDBSyncerObject *)obj dependencies:(BOOL)withDeps {
-    
-    // set up response
-    CouchDBSyncerResponse *response = [[CouchDBSyncerResponse alloc] init];    
-    response.delegate = self;
-    if(obj) [response addObject:obj];
-    
-    NSOperation *dep = nil;
-    if(withDeps) {
-        // find response dependencies.
-        // documents/attachments should be returned in ascending sequence id order
-        // (this also ensures attachments are returned after the documents are returned)
-        for(NSOperation *op in [responseQueue.operations reverseObjectEnumerator]) {
-            if(![op isCancelled]) {
-                dep = op;
-                break;
-            }
-        }
-        if(bulkFetcher) dep = bulkFetcher;
-        if(dep) [response addDependency:dep];
-    }
-    //LOG(@"created response, dependency: %@", dep);
-    
-    // add to response queue
-    [responseQueue addOperation:response];
-    
-    countReq++;
-    
-    return [response autorelease];
-}
-
-- (CouchDBSyncerResponse *)fetcherResponse:(CouchDBSyncerObject *)obj {
-    return [self fetcherResponse:obj dependencies:YES];
-}
-
 #pragma mark -
 
-- (id)init {
-    if((self = [super init])) {
+- (id)initWithStore:(CouchDBSyncerStore *)s database:(CouchDBSyncerDatabase *)d {
+    self = [super init];
+    if(self) {
         fetchQueue = [[NSOperationQueue alloc] init];
         [fetchQueue setMaxConcurrentOperationCount:MaxDownloadCount];
         responseQueue = [[NSOperationQueue alloc] init];
@@ -77,27 +34,36 @@
         
         maxConcurrentFetches = MaxDownloadCount;
         docsPerRequest = 0;  // unlimited
+        
+        store = [s retain];
+        database = [d retain];
     }
     return self;
 }
 
-- (id)initWithServerPath:(NSString *)path delegate:(id<CouchDBSyncerDelegate>)d {
-    if((self = [self init])) {
-        self.serverPath = path;
-        self.delegate = d;
-    }
+- (id)init {
+    self = [self initWithStore:nil database:nil];
     return self;
 }
 
 - (void)dealloc {
-    delegate = nil;
+    [store release];
+    [database release];
+    
     [fetchQueue release];
     [responseQueue release];
-    [serverPath release];
     [changeFetcher release];
     [startedAt release];
     
     [super dealloc];
+}
+
+#pragma mark Private
+
+- (NSString *)urlEncodeValue:(NSString *)str {
+    NSString *result = (NSString *) CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)str, NULL,
+                                                                            CFSTR(":/?#[]@!$&’()*+,;="), kCFStringEncodingUTF8);
+    return [result autorelease];
 }
 
 #pragma mark -
@@ -149,18 +115,21 @@
 
 - (void)completed {
     running = NO;
-    [delegate couchDBSyncerCompleted:self];
+    //[delegate couchDBSyncerCompleted:self];
 }
 
-- (void)fetchChanges {
-    [self fetchChangesSince:sequenceId];
-}
-
-- (void)fetchChangesSince:(int)sid {
-    if(running) {
+- (void)update {
+    if([fetchThread isExecuting]) {
         LOG(@"already fetching changes, returning");
         return;
     }
+    [fetchThread release];
+    fetchThread = [[NSThread alloc] initWithTarget:self selector:@selector(updateThread) object:nil];
+    [fetchThread start];
+}
+
+- (void)updateThread {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     [self resetReqCounters];
     running = YES;
@@ -170,17 +139,19 @@
     [startedAt release];
     startedAt = [[NSDate date] retain];
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/_changes?since=%d", serverPath, sid]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/_changes?since=%d", database.url, database.sequenceId]];
     [changeFetcher release];
     changeFetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
     changeFetcher.fetchType = CouchDBSyncerFetchTypeChanges;
     [changeFetcher fetch];
     countReq++;
+    
+    [pool release];
 }
 
 // fetches document / attachments (adds to fetch queue)
 - (void)fetchAttachment:(CouchDBSyncerAttachment *)att priority:(NSOperationQueuePriority)priority {
-    
+
     if(aborted) {
         LOG(@"syncer is aborted, returning");
         return;
@@ -191,6 +162,8 @@
         LOG(@"attachment document is deleted, returning");
         return;  // do nothing
     }
+    
+    /*
     
     // don't fetch attachment if it is already in the queue to be fetched.
     // (this could happen if there was an attachment with unfetched changes, and the attachment has changed again).
@@ -212,14 +185,14 @@
             }
         }
     }
+     */
     
     // fetch attachment
-    NSString *path = [NSString stringWithFormat:@"%@/%@/%@", serverPath, [self urlEncodeValue:att.documentId], [self urlEncodeValue:att.filename]];    
+    NSString *path = [NSString stringWithFormat:@"%@/%@/%@", database.url, [self urlEncodeValue:att.documentId], [self urlEncodeValue:att.filename]];    
     NSURL *url = [NSURL URLWithString:path];
     
     CouchDBSyncerFetch *fetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
     fetcher.queuePriority = priority;
-    fetcher.response = [self fetcherResponse:att];
     fetcher.fetchType = CouchDBSyncerFetchTypeAttachment;
     [fetchQueue addOperation:fetcher];
     [fetcher release];
@@ -233,35 +206,24 @@
         return;
     }
     
-    if(doc.deleted) {
-        // document deleted - just create a response, no need to perform fetch
-        [self fetcherResponse:doc];
+    if(bulkFetcher == nil) {
+        // create a new bulk fetch operation
+        bulkFetcher = [[CouchDBSyncerBulkFetch alloc] initWithURL:database.url delegate:self];
+        bulkFetcher.queuePriority = priority;
+    } else {
+        // need to manually increment request count
+        countReq++;
     }
-    else {
-        // need to fetch document
-        if(bulkFetcher == nil) {
-            // create response before bulkFetcher
-            // (this is important for the dependency code, so the fetcher doesn't have itself as a dependency)
-            CouchDBSyncerResponse *resp = [self fetcherResponse:nil];
-            
-            // create a new bulk fetch operation
-            bulkFetcher = [[CouchDBSyncerBulkFetch alloc] initWithServerPath:serverPath delegate:self];
-            bulkFetcher.queuePriority = priority;
-            bulkFetcher.response = resp;
-        } else {
-            // need to manually increment request count
-            countReq++;
-        }
+    
+    // add document to bulk fetcher list
+    [bulkFetcher addDocument:doc];
+    
+    if(docsPerRequest > 0 && [bulkFetcher documentCount] >= docsPerRequest) {
+        // bulk fetcher is ready to start
+        [fetchQueue addOperation:bulkFetcher];
+        [bulkFetcher release];
+        bulkFetcher = nil;
         
-        // add document to bulk fetcher list
-        [bulkFetcher addDocument:doc];
-        
-        if(docsPerRequest > 0 && [bulkFetcher documentCount] >= docsPerRequest) {
-            // bulk fetcher is ready to start
-            [fetchQueue addOperation:bulkFetcher];
-            [bulkFetcher release];
-            bulkFetcher = nil;
-        }
     }
     
     countReqDoc++;
@@ -276,10 +238,7 @@
 }
 
 - (void)fetchDatabaseInformation {
-    NSURL *url = [NSURL URLWithString:serverPath];
-    
-    CouchDBSyncerFetch *fetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
-    fetcher.response = [self fetcherResponse:nil dependencies:NO];  // dbinfo response
+    CouchDBSyncerFetch *fetcher = [[CouchDBSyncerFetch alloc] initWithURL:database.url delegate:self];
     fetcher.fetchType = CouchDBSyncerFetchTypeDBInfo;
     [fetchQueue addOperation:fetcher];
     [fetcher release];
@@ -306,11 +265,12 @@
     if(fetcher.error) {
         // error occurred
         // TODO: retry fetches a few times ?
+        
         // abort all outstanding fetch requests
         [self abort];
         
         // notify delegate
-        [delegate couchDBSyncer:self didFailWithError:fetcher.error];
+        //[delegate couchDBSyncer:self didFailWithError:fetcher.error];
         return;
     }
     
@@ -346,22 +306,39 @@
         [changeFetcher release];
         changeFetcher = nil;
         
-        // notify delegate of list of changes
-        [delegate couchDBSyncer:self didFetchChanges:list];
-        
-        // start bulk document fetch
-        if(bulkFetcher) {
-        	[fetchQueue addOperation:bulkFetcher];
-            [bulkFetcher release];
-            bulkFetcher = nil;
-        }
-        
-        changesReported = YES;
-        
         // report completion if no changes were detected
         if([list count] == 0) {
             [self completed];
+            return;
         }
+        
+        // download changed documents
+        for(CouchDBSyncerDocument *doc in changes) {
+            policy.download = [doc isDesignDocument] ? NO : YES;
+            policy.priority = NSOperationQueuePriorityNormal;
+            
+            if([delegate respondsToSelector:@selector(couchDBSyncerStore:document:policy:)])
+                [delegate couchDBSyncerStore:self document:doc policy:policy];
+            
+            if(policy.download)
+                [syncer fetchDocument:doc priority:policy.priority];
+        }
+        
+        [policy release];
+        
+        // download unfetched attachments.
+        // need to convert managed objects to CouchDBSyncerAttachments first
+        NSArray *unfetchedAttachments = [self unfetchedAttachments];
+        NSMutableArray *list = [NSMutableArray array];
+        for(MOCouchDBSyncerAttachment *attachment in unfetchedAttachments) {
+            [list addObject:[self attachmentFromManagedObject:attachment]];
+        }
+        if([list count] > 0) {
+            LOG(@"downloading %d unfetched attachments", [list count]);
+            [self downloadAttachments:list];
+        }
+        
+
     }
     else {
         // fetched data
@@ -389,11 +366,46 @@
         [fetcher.response markCompleted];        
         bytes += len;
         
-        if([delegate respondsToSelector:@selector(couchDBSyncerProgress:)])
-            [delegate couchDBSyncerProgress:self];
+        //if([delegate respondsToSelector:@selector(couchDBSyncerProgress:)])
+        //    [delegate couchDBSyncerProgress:self];
     }
 }
 
+/*
+- (void)couchDBSyncer:(CouchDBSyncer *)s didFetchChanges:(NSArray *)changes {
+    LOG(@"fetched changelist: %d items", [changes count]);
+    CouchDBSyncerStorePolicy *policy = [[CouchDBSyncerStorePolicy alloc] init];
+    
+    // download changed documents
+    for(CouchDBSyncerDocument *doc in changes) {
+        policy.download = [doc isDesignDocument] ? NO : YES;
+        policy.priority = NSOperationQueuePriorityNormal;
+        
+        if([delegate respondsToSelector:@selector(couchDBSyncerStore:document:policy:)])
+            [delegate couchDBSyncerStore:self document:doc policy:policy];
+        
+        if(policy.download)
+            [syncer fetchDocument:doc priority:policy.priority];
+    }
+    
+    [policy release];
+    
+    // download unfetched attachments.
+    // need to convert managed objects to CouchDBSyncerAttachments first
+    NSArray *unfetchedAttachments = [self unfetchedAttachments];
+    NSMutableArray *list = [NSMutableArray array];
+    for(MOCouchDBSyncerAttachment *attachment in unfetchedAttachments) {
+        [list addObject:[self attachmentFromManagedObject:attachment]];
+    }
+    if([list count] > 0) {
+        LOG(@"downloading %d unfetched attachments", [list count]);
+        [self downloadAttachments:list];
+    }
+}
+ 
+ */
+
+/*
 #pragma mark CouchDBSyncerResponseDelegate
 
 - (void)couchDBSyncerResponseComplete:(CouchDBSyncerResponse *)response {
@@ -431,5 +443,6 @@
     if(changesReported && countFin == countReq)
         [self completed];
 }
+ */
 
 @end

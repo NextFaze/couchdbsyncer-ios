@@ -11,9 +11,10 @@
 #import "CouchDBSyncerDocument.h"
 
 @interface CouchDBSyncerBulkFetch : CouchDBSyncerFetch {
+    NSMutableArray *documents;
 }
 
-- (id)initWithServerPath:(NSString *)path delegate:(id<CouchDBSyncerFetchDelegate>)d;
+- (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d;
 
 - (void)addDocument:(CouchDBSyncerDocument *)doc;
 - (int)documentCount;

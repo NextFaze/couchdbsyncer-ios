@@ -8,6 +8,7 @@
 
 #import "TestAppViewController.h"
 #import "TestAppDocListViewController.h"
+#import "TestApplication.h"
 
 #define TestAppServerName @"ServerName"
 #define TestAppDocsPerReq @"DocsPerReq"
@@ -16,8 +17,42 @@
 
 @synthesize tfServer, tfDocsPerReq;
 @synthesize buttonDocs, buttonReset, buttonSync, labelStatus, labelDocs, progressView1, progressView2, progressView3;
+@synthesize syncer;
+
+// The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization.
+        syncer = [[CouchDBSyncer alloc] init];
+    }
+    return self;
+}
+
+- (void)deallocView {
+    self.buttonDocs = nil;
+    self.buttonReset = nil;
+    self.buttonSync = nil;
+    self.labelStatus = nil;
+    self.labelDocs = nil;
+    self.progressView1 = nil;
+    self.progressView2 = nil;
+    self.progressView3 = nil;
+    self.tfServer = nil;
+    self.tfDocsPerReq = nil;
+}
+
+- (void)dealloc {
+    [self deallocView];    
+    [super dealloc];
+}
 
 #pragma mark -
+
+- (CouchDBSyncerStore *)store {
+    TestApplication *app = (TestApplication *)[UIApplication sharedApplication];
+    return app.dataStore;
+}
 
 - (void)updateProgress {
 	progressView1.progress = [store.syncer progressDocuments];
@@ -61,17 +96,6 @@
 
 #pragma mark -
 
-// The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-/*
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization.
-    }
-    return self;
-}
-*/
-
 /*
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
@@ -84,9 +108,6 @@
 	
 	tfServer.text = [[NSUserDefaults standardUserDefaults] valueForKey:TestAppServerName];
 	tfDocsPerReq.text = [[NSUserDefaults standardUserDefaults] valueForKey:TestAppDocsPerReq];
-
-	store = [[CouchDBSyncerStore alloc] initWithName:@"testapp" serverPath:tfServer.text delegate:self];
-    store.syncer.docsPerRequest = [tfDocsPerReq.text intValue];
 
 	[self updateProgress];
 	[self updateStats];
@@ -111,25 +132,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-	
-	[store release];
-	store = nil;
-}
-
-- (void)dealloc {
-	[tfServer release];
-    [tfDocsPerReq release];
-	[buttonDocs release];
-	[buttonReset release];
-	[buttonSync release];
-	[labelStatus release];
-	[labelDocs release];
-	[progressView1 release];
-	[progressView2 release];
-	[progressView3 release];
-
-	[store release];
-    [super dealloc];
+	[self deallocView];
 }
 
 #pragma mark UITextFieldDelegate
@@ -146,7 +149,7 @@
 	}
     else if(textField == tfDocsPerReq) {
 		[[NSUserDefaults standardUserDefaults] setValue:tfDocsPerReq.text forKey:TestAppDocsPerReq];        
-        store.syncer.docsPerRequest = [tfDocsPerReq.text intValue];
+        syncer.docsPerRequest = [tfDocsPerReq.text intValue];
     }
 }
 

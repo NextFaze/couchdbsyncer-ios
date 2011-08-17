@@ -15,7 +15,7 @@
     int length, revpos;
     BOOL deleted;
     NSData *content;
-    CouchDBSyncerDocument *document;
+    CouchDBSyncerDocument *document;  // weak link
 }
 
 @property (nonatomic, retain) NSString *contentType, *filename, *documentId;
