@@ -101,7 +101,6 @@
 }
 
 // return a CouchDBSyncerAttachment object corresponding to the managed object
-// (used for re-downloading unfetched attachments)
 - (CouchDBSyncerAttachment *)attachmentObject:(MOCouchDBSyncerAttachment *)attachment {
     
     CouchDBSyncerAttachment *att = [[[CouchDBSyncerAttachment alloc] init] autorelease];
@@ -112,9 +111,6 @@
     att.length = [attachment.length intValue];
     att.revpos = [attachment.revpos intValue];
     att.deleted = NO;
-    
-    // don't need the content as this object is only used for fetch requests currently
-    //att.content = attachment.content;
     
     return att;
 }
@@ -215,6 +211,8 @@
 - (void)destroy:(CouchDBSyncerDatabase *)database {
     MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
     [managedObjectContext deleteObject:moDatabase];
+    database.sequenceId = 0;
+    [self saveDatabase];
 }
 
 // purge all data for the specified database
@@ -223,16 +221,18 @@
     for(MOCouchDBSyncerDocument *moDocument in moDatabase.documents) {
         [managedObjectContext deleteObject:moDocument];
     }
+    moDatabase.sequenceId = 0;
+    database.sequenceId = 0;
     [self saveDatabase];
 }
 
-// purge this store
-- (void)purge {
+// delete all databases from this store
+- (void)destroy {
     if(![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(purge) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(destroy) withObject:nil waitUntilDone:YES];
         return;
     }
-    LOG(@"purging all content");
+    LOG(@"deleting all content");
     
     for(MOCouchDBSyncerDatabase *moDatabase in [self moDatabases]) {
         [managedObjectContext deleteObject:moDatabase];
@@ -240,10 +240,14 @@
     [self saveDatabase];
 }
 
-- (int)countForEntityName:(NSString *)entityName {
+- (int)countForEntityName:(NSString *)entityName database:(MOCouchDBSyncerDatabase *)moDatabase {
     NSError *err = nil;
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database"];
+    predicate = [predicate predicateWithSubstitutionVariables:
+                 [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", nil]];
     [request setEntity:[NSEntityDescription entityForName:entityName inManagedObjectContext:managedObjectContext]];
+    [request setPredicate:predicate];
     NSUInteger count = [managedObjectContext countForFetchRequest:request error:&err];	
     [request release];
     
@@ -251,8 +255,9 @@
 }
 
 - (NSDictionary *)statistics:(CouchDBSyncerDatabase *)database {
-    int docs = [self countForEntityName:@"Document"];
-    int attachments = [self countForEntityName:@"Attachment"];
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    int docs = [self countForEntityName:@"Document" database:moDatabase];
+    int attachments = [self countForEntityName:@"Attachment" database:moDatabase];
     
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt:attachments], @"attachments",
@@ -292,23 +297,89 @@
     return documents;
 }
 
-- (NSArray *)documentsOfType:(NSString *)type {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == $type"];
-    predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:type, @"type", nil]];
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database AND type == $type"];
+    predicate = [predicate predicateWithSubstitutionVariables:
+                 [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", type, @"type", nil]];
     return [self documentsMatching:predicate];
 }
 
-- (NSArray *)documentsTagged:(NSString *)tag {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tags CONTAINS[c] $tag", tag];
-    predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:tag, @"tag", nil]];
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database tagged:(NSString *)tag {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database AND tags CONTAINS[c] $tag"];
+    predicate = [predicate predicateWithSubstitutionVariables:
+                 [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", tag, @"tag", nil]];
     return [self documentsMatching:predicate];
 }
 
-- (NSArray *)documentsOfType:(NSString *)type tagged:(NSString *)tag {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == $type AND tags CONTAINS[c] $tag", tag];
-    predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:type, @"type", tag, @"tag", nil]];
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type tagged:(NSString *)tag {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database AND type == $type AND tags CONTAINS[c] $tag"];
+    predicate = [predicate predicateWithSubstitutionVariables:
+                 [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", type, @"type", tag, @"tag", nil]];
     return [self documentsMatching:predicate];
 }
+
+- (NSArray *)documentTypes:(CouchDBSyncerDatabase *)database {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Document" inManagedObjectContext:self.managedObjectContext];
+    NSDictionary *entityProperties = [entity propertiesByName];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database"];
+    predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", nil]];
+    [request setEntity:entity];
+    [request setPredicate:predicate];
+    [request setReturnsDistinctResults:YES];
+    [request setPropertiesToFetch:[NSArray arrayWithObject:[entityProperties objectForKey:@"type"]]];
+    [request setSortDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"rank" ascending:YES] autorelease]]];
+    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:nil];
+    [request release];
+    
+    LOG(@"result: %@", result);
+    return result;
+}
+
+#pragma mark Attachments (with content) fetching
+
+// return attachments with content for the given document
+- (NSArray *)attachments:(CouchDBSyncerDocument *)document {
+    NSMutableArray *results = [NSMutableArray array];
+    MOCouchDBSyncerDocument *moDocument = [self moDocumentObject:document];
+    for(MOCouchDBSyncerAttachment *moAttachment in moDocument.attachments) {
+        CouchDBSyncerAttachment *attachment = [self attachmentObject:moAttachment];
+        attachment.content = moAttachment.content;  // loads content
+        [results addObject:attachment];
+    }
+    return results;
+}
+
+// return an attachment with content from the given document
+- (CouchDBSyncerAttachment *)attachment:(CouchDBSyncerDocument *)document named:(NSString *)name {
+    for(CouchDBSyncerAttachment *attachment in document.attachments) {
+        if([attachment.filename isEqualToString:name]) {
+            MOCouchDBSyncerAttachment *moAttachment = [self moAttachmentObject:attachment];
+            CouchDBSyncerAttachment *result = [self attachmentObject:moAttachment];
+            result.content = moAttachment.content;
+            return result;
+        }
+    }
+    return nil;
+}
+
+// returns all MOCouchDBSyncerAttachment objects that haven't been fetched yet
+- (NSArray *)staleAttachments:(CouchDBSyncerDatabase *)database {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSDictionary *subs = [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", nil];
+    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"staleAttachments" substitutionVariables:subs];
+    NSArray *list = [managedObjectContext executeFetchRequest:fetch error:nil];
+    NSMutableArray *result = [NSMutableArray array];
+    for(MOCouchDBSyncerAttachment *moAttachment in list) {
+        [result addObject:[self attachmentObject:moAttachment]];
+    }
+    return result;
+}
+
 
 #pragma mark -
 
@@ -415,23 +486,6 @@
     return managedObjectContext;
 }
 
-#pragma mark -
-
-// returns all MOCouchDBSyncerAttachment objects that haven't been fetched yet
-- (NSArray *)staleAttachments:(CouchDBSyncerDatabase *)database
-{
-    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
-    NSDictionary *subs = [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", nil];
-    NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"staleAttachments" substitutionVariables:subs];
-    NSArray *list = [managedObjectContext executeFetchRequest:fetch error:nil];
-    NSMutableArray *result = [NSMutableArray array];
-    for(MOCouchDBSyncerAttachment *moAttachment in list) {
-        [result addObject:[self attachmentObject:moAttachment]];
-    }
-    return result;
-}
-
-#pragma mark CouchDBSyncerDelegate handlers (to be run on main thread)
 
 /*
 - (void)syncerFoundDeletedDocument:(CouchDBSyncerDocument *)doc {
@@ -498,16 +552,16 @@
     LOG(@"document: %@ (seq %d)", document, document.sequenceId);
     
     if(document.deleted) {
-        LOG(@"removing document: %@ (seq %d)", document, document.sequenceId);
+        if(moDocument) {
+            LOG(@"removing document: %@ (seq %d)", document, document.sequenceId);
         
-        // delete document & attachments
-        if(document) {
+            // delete document & attachments
             [moc deleteObject:moDocument];
-        }
         
-        // save database (updates sequence id)
-        moDatabase.sequenceId = [NSNumber numberWithInt:document.sequenceId];
-        [self saveDatabase:moc];
+            // save database (updates sequence id)
+            moDatabase.sequenceId = [NSNumber numberWithInt:document.sequenceId];
+            [self saveDatabase:moc];
+        }
         return;
     }
     
@@ -531,7 +585,6 @@
     moDocument.database = moDatabase;
     
     NSMutableSet *old = [NSMutableSet setWithSet:moDocument.attachments];
-    NSMutableSet *new = [NSMutableSet set];
     
     for(CouchDBSyncerAttachment *att in document.attachments) {
         MOCouchDBSyncerAttachment *moAttachment = [self moAttachmentObject:att context:moc];
@@ -555,8 +608,7 @@
             moAttachment.documentId = att.documentId;
             moAttachment.document = moDocument;
             moAttachment.revpos = [NSNumber numberWithInt:att.revpos];
-            
-            [new addObject:moAttachment];  // add to list to be downloaded
+            moAttachment.database = context.moDatabase;
         }
     }
     
@@ -587,7 +639,6 @@
     moAttachment.length = [NSNumber numberWithInt:[attachment.content length]];
     moAttachment.stale = [NSNumber numberWithBool:NO];
     moAttachment.revpos = [NSNumber numberWithInt:attachment.revpos];
-    moAttachment.database = context.moDatabase;
     
     // save database 
     [self saveDatabase:moc];

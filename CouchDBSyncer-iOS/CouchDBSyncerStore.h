@@ -35,7 +35,7 @@
 - (id)initWithShippedDatabasePath:(NSString *)shippedPath;
 
 // purge the store (removes all databases)
-- (void)purge;
+- (void)destroy;
 
 // purge all data for the specified database
 - (void)purge:(CouchDBSyncerDatabase *)database;
@@ -55,7 +55,6 @@
 
 // get documents
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database;
-- (NSArray *)documents:(CouchDBSyncerDatabase *)database matching:(NSPredicate *)predicate;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type tagged:(NSString *)tag;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database tagged:(NSString *)tag;
@@ -64,10 +63,8 @@
 // get document types (array of NSString)
 - (NSArray *)documentTypes:(CouchDBSyncerDatabase *)database;
 
-// get all attachments from a document
+// get attachments
 - (NSArray *)attachments:(CouchDBSyncerDocument *)document;
-
-// get attachment
 - (CouchDBSyncerAttachment *)attachment:(CouchDBSyncerDocument *)document named:(NSString *)name;
 
 // update methods

@@ -58,7 +58,7 @@
         self.username = u.user;
         self.password = u.password;
         
-        LOG(@"url: %@, username: %@, password: %@", self.url, self.username, self.password);
+        //LOG(@"url: %@, username: %@, password: %@", self.url, self.username, self.password);
     }
     return self;
 }
@@ -123,14 +123,12 @@
 
 // decode the received data as JSON and parse into a dictionary
 - (NSDictionary *)dictionary {
-    LOG(@"string: %@", [self string]);
     return [[self string] JSONValue];
 }
 
 #pragma mark NSURLConnectionDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)err {
-    if(err.code == -1200) return;  // SSL error - seems to work anyway
     self.error = err;
     LOG(@"error: %@", err);
     [self finish];

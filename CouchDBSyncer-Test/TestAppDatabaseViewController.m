@@ -16,7 +16,7 @@
 
 @implementation TestAppDatabaseViewController
 
-@synthesize tfDocsPerReq, tfUsername, tfPassword;
+@synthesize tfDocsPerReq;
 @synthesize buttonDocs, buttonReset, buttonSync, labelStatus, labelDocs, progressView1, progressView2, progressView3;
 @synthesize database;
 
@@ -55,8 +55,6 @@
     self.progressView2 = nil;
     self.progressView3 = nil;
     self.tfDocsPerReq = nil;
-    self.tfUsername = nil;
-    self.tfPassword = nil;
 }
 
 - (void)dealloc {
@@ -70,30 +68,6 @@
 
 #pragma mark -
 
-- (NSDictionary *)fetchCredentials {
-    NSData *data = [[NSUserDefaults standardUserDefaults] valueForKey:@"Credentials"];
-    NSDictionary *dict = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    return dict;
-}
-
-- (void)loadCredentials {
-    NSDictionary *dict = [[self fetchCredentials] valueForKey:database.name];
-    if(dict) {
-        tfUsername.text = [dict valueForKey:@"username"];
-        tfPassword.text = [dict valueForKey:@"password"];
-    }
-}
-
-- (void)saveCredentials {
-    NSDictionary *dict = [self fetchCredentials];
-    NSMutableDictionary *new = dict ? [NSMutableDictionary dictionaryWithDictionary:dict] : [NSMutableDictionary dictionary];
-    NSDictionary *cred = [NSDictionary dictionaryWithObjectsAndKeys:tfUsername.text, @"username", tfPassword.text, @"password", nil];
-    [new setValue:cred forKey:database.name];
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:new];
-    [[NSUserDefaults standardUserDefaults] setValue:data forKey:@"Credentials"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
 - (void)updateProgress {
 	progressView1.progress = [syncer progressDocuments];
 	progressView2.progress = [syncer progressAttachments];
@@ -101,7 +75,7 @@
 }
 
 - (void)updateStats {
-	NSDictionary *stats = [[self store] statistics];
+	NSDictionary *stats = [[self store] statistics:database];
 	NSMutableString *str = [NSMutableString string];
 	for(NSString *key in [stats allKeys]) {
 		[str appendFormat:@"%@: %@\n", key, [stats valueForKey:key]];
@@ -130,9 +104,6 @@
 	}
 	else if(sender == buttonSync) {
 		[self setStatus:@"syncing"];
-        syncer.username = tfUsername.text;
-        syncer.password = tfPassword.text;
-        [self saveCredentials];
         [syncer update];
 	}
 }
@@ -154,9 +125,7 @@
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editDatabase:)];
     self.navigationItem.rightBarButtonItem = item;
     [item release];
- 
-    [self loadCredentials];
-    
+     
     self.title = database.name;
     
 	[self updateProgress];
@@ -211,7 +180,8 @@
 	[self updateStats];
 	[self setStatus:@"complete"];
     
-    LOG(@"complete, progress: %.2f, %.2f, %.2f", [syncer progressDocuments], [syncer progressAttachments], [syncer progress]);
+    LOG(@"complete, progress: %.2f, %.2f, %.2f",
+        [syncer progressDocuments], [syncer progressAttachments], [syncer progress]);
 }
 
 - (void)couchDBSyncerFailed:(CouchDBSyncer *)s {

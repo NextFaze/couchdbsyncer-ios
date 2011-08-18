@@ -45,8 +45,11 @@
 }
 
 - (id)valueForKey:(NSString *)key {
-    return [dictionary valueForKey:key];
+    id val = [dictionary valueForKey:key];
+    if([val isKindOfClass:[NSNull class]]) return nil;
+    return val;
 }
+
 - (NSString *)stringValueForKey:(NSString *)key {
     return [NSString stringWithFormat:@"%@", [dictionary valueForKey:key]];
 }
@@ -77,7 +80,7 @@
     dictionary = [dict retain];
     [oldDict release];
     
-    NSDictionary *attlist = [dictionary valueForKey:@"_attachments"];
+    NSDictionary *attlist = [self valueForKey:@"_attachments"];  // converts NSNull to nil
     
     NSMutableArray *list = [[NSMutableArray alloc] init];
     for(NSString *fname in [attlist allKeys]) {

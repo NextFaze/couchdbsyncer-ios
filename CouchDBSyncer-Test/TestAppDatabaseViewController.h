@@ -12,7 +12,7 @@
 #import "CouchDBSyncerDatabase.h"
 
 @interface TestAppDatabaseViewController : UIViewController <UITextFieldDelegate, CouchDBSyncerDelegate> {	
-	UITextField *tfDocsPerReq, *tfUsername, *tfPassword;
+	UITextField *tfDocsPerReq;
 	UIButton *buttonSync, *buttonReset, *buttonDocs;
 	UILabel *labelStatus, *labelDocs;
 	UIProgressView *progressView1, *progressView2, *progressView3;
@@ -25,7 +25,7 @@
 
 @property (nonatomic, retain) IBOutlet UILabel *labelStatus, *labelDocs;
 @property (nonatomic, retain) IBOutlet UIButton *buttonSync, *buttonReset, *buttonDocs;
-@property (nonatomic, retain) IBOutlet UITextField *tfDocsPerReq, *tfUsername, *tfPassword;
+@property (nonatomic, retain) IBOutlet UITextField *tfDocsPerReq;
 @property (nonatomic, retain) IBOutlet UIProgressView *progressView1, *progressView2, *progressView3;
 
 - (id)initWithDatabase:(CouchDBSyncerDatabase *)database;

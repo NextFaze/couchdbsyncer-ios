@@ -29,9 +29,6 @@
     CouchDBSyncerFetch *changeFetcher;
     NSOperationQueue *fetchQueue;       // SyncerFetch objects go here when ready to be fetched
     NSDate *startedAt;
-    NSString *username, *password;
-    
-    BOOL aborted, running, changesReported;
     
     int docsPerRequest;                      // documents per request - tunable parameter
     int maxConcurrentFetches;                // maximum concurrent fetch operations
@@ -45,8 +42,8 @@
     int bytes, bytesDoc, bytesAtt;
 }
 
+@property (nonatomic, retain) NSError *error;
 @property (nonatomic, readonly) int bytes, bytesDoc, bytesAtt, countReq, countFin, countHttpFin;
-@property (nonatomic, retain) NSString *username, *password;
 @property (nonatomic, assign) int docsPerRequest, maxConcurrentFetches;
 @property (nonatomic, readonly) NSDate *startedAt;
 @property (nonatomic, assign) NSObject<CouchDBSyncerDownloadPolicyDelegate> *downloadPolicyDelegate;

@@ -17,11 +17,11 @@
 
 @synthesize docsPerRequest;
 @synthesize downloadPolicyDelegate, delegate;
-@synthesize username, password;
 
 // readonly
 @synthesize countReq, countFin, countHttpFin, bytes, bytesDoc, bytesAtt;
 @synthesize startedAt;
+@synthesize error;
 
 #pragma mark -
 
@@ -51,12 +51,11 @@
     
     [store release];
     [database release];
-    [username release];
-    [password release];
     
     [fetchQueue release];
     [changeFetcher release];
     [startedAt release];
+    [error release];
     
     [super dealloc];
 }
@@ -74,6 +73,28 @@
     return [result autorelease];
 }
 
+- (void)enqueueBulkFetch {
+    if(bulkFetcher == nil) return;
+    
+    // if there's any other bulk fetch operations in the queue, make sure this one executes after them
+    // (maintains sequence ordering)
+    for(NSOperation *operation in [[fetchQueue operations] reverseObjectEnumerator]) {
+        if(![operation isFinished] && [operation isKindOfClass:[CouchDBSyncerBulkFetch class]]) {
+            [bulkFetcher addDependency:operation];
+            LOG(@"bulk fetch %@ dependency: %@", bulkFetcher, operation);
+            break;
+        }
+    }
+    
+    [fetchQueue addOperation:bulkFetcher];
+    [bulkFetcher release];
+    bulkFetcher = nil;
+}
+
+- (void)completed {
+    [self callDelegate:@selector(couchDBSyncerCompleted:)];
+}
+
 #pragma mark -
 
 - (void)resetReqCounters {
@@ -89,10 +110,8 @@
     [self resetReqCounters];
     bytes = bytesDoc = bytesAtt = 0;
     countHttpFin = 0;
-    
-    running = NO;
-    aborted = NO;
-    
+        
+    [fetchThread cancel];
     [fetchQueue cancelAllOperations];
     
     [bulkFetcher release];
@@ -116,25 +135,23 @@
     // abort all document fetches
     // (prevents new documents being fetched)
     [self reset];
-    aborted = YES;
-    running = NO;
-}
-
-- (void)completed {
-    running = NO;
-    [self callDelegate:@selector(couchDBSyncerCompleted:)];
 }
 
 - (void)update {
-    if(running) {
+    if([fetchThread isExecuting]) {
         LOG(@"update already running, returning");
         return;
     }
     
+    [fetchThread release];
+    fetchThread = [[NSThread alloc] initWithTarget:self selector:@selector(updateThread) object:nil];
+    [fetchThread start];
+}
+
+- (void)updateThread {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
     [self resetReqCounters];
-    running = YES;
-    aborted = NO;
-    changesReported = NO;
     
     [startedAt release];
     startedAt = [[NSDate date] retain];
@@ -143,16 +160,23 @@
     [changeFetcher release];
     changeFetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
     changeFetcher.fetchType = CouchDBSyncerFetchTypeChanges;
-    changeFetcher.username = username;
-    changeFetcher.password = password;
-    [changeFetcher fetch];
+    [fetchQueue addOperation:changeFetcher];
     countReq++;
+    
+    // wait until all operations are finished.
+    // when this returns, sync is complete
+    [fetchQueue waitUntilAllOperationsAreFinished];
+    
+    LOG(@"all operations finished");
+    [self completed];
+    
+    [pool release];
 }
 
 // fetches document / attachments (adds to fetch queue)
 - (void)fetchDocument:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)att priority:(NSOperationQueuePriority)priority {
 
-    if(aborted) {
+    if([fetchThread isCancelled]) {
         LOG(@"syncer is aborted, returning");
         return;
     }
@@ -163,13 +187,11 @@
         return;  // do nothing
     }
     
-    /*
-    
     // don't fetch attachment if it is already in the queue to be fetched.
     // (this could happen if there was an attachment with unfetched changes, and the attachment has changed again).
     for(CouchDBSyncerFetch *fetch in fetchQueue.operations) {
         if(![fetch isCancelled] && fetch.fetchType == CouchDBSyncerFetchTypeAttachment) {
-            CouchDBSyncerAttachment *att_fetching = [[fetch.response objects] objectAtIndex:0];
+            CouchDBSyncerAttachment *att_fetching = fetch.attachment;
             if([att_fetching.documentId isEqualToString:att.documentId] && [att_fetching.filename isEqualToString:att.filename]) {
                 // same attachment
                 if(att_fetching.revpos >= att.revpos) {
@@ -185,7 +207,6 @@
             }
         }
     }
-     */
     
     // fetch attachment
     NSString *path = [NSString stringWithFormat:@"%@/%@/%@", database.url, [self urlEncodeValue:att.documentId], [self urlEncodeValue:att.filename]];    
@@ -196,16 +217,15 @@
     fetcher.fetchType = CouchDBSyncerFetchTypeAttachment;
     fetcher.attachment = att;
     fetcher.document = document;
-    fetcher.username = username;
-    fetcher.password = password;
     [fetchQueue addOperation:fetcher];
     [fetcher release];
     
+    countReq++;
     countReqAtt++;
 }
 
 - (void)fetchDocument:(CouchDBSyncerDocument *)doc priority:(NSOperationQueuePriority)priority {
-    if(aborted) {
+    if([fetchThread isCancelled]) {
         LOG(@"syncer is aborted, returning");
         return;
     }
@@ -214,24 +234,17 @@
         // create a new bulk fetch operation
         bulkFetcher = [[CouchDBSyncerBulkFetch alloc] initWithURL:database.url delegate:self];
         bulkFetcher.queuePriority = priority;
-        bulkFetcher.username = username;
-        bulkFetcher.password = password;
-    } else {
-        // need to manually increment request count
-        countReq++;
     }
     
     // add document to bulk fetcher list
     [bulkFetcher addDocument:doc];
+    countReq++;
+    countReqDoc++;
     
     if(docsPerRequest > 0 && [bulkFetcher documentCount] >= docsPerRequest) {
         // bulk fetcher is ready to start
-        [fetchQueue addOperation:bulkFetcher];
-        [bulkFetcher release];
-        bulkFetcher = nil;
-    }
-    
-    countReqDoc++;
+        [self enqueueBulkFetch];
+    }    
 }
 
 - (void)fetchDocument:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)att {
@@ -274,6 +287,8 @@
     fetcher.fetchType = CouchDBSyncerFetchTypeDBInfo;
     [fetchQueue addOperation:fetcher];
     [fetcher release];
+    
+    countReq++;
 }
 
 - (void)fetchDocument:(CouchDBSyncerDocument *)document attachments:(NSArray *)attachments {
@@ -306,9 +321,11 @@
     
     countHttpFin++;
     
-    if(fetcher.error) {
+    if(fetcher.error && fetcher.fetchType != CouchDBSyncerFetchTypeAttachment) {
         // error occurred
+        // ignore attachment download errors - they will be redownloaded later
         // TODO: retry fetches a few times ?
+        self.error = fetcher.error;
         
         // abort all outstanding fetch requests
         [self abort];
@@ -328,6 +345,7 @@
          "last_seq":2}
          */
 
+        countFin++;
         NSDictionary *changes = [fetcher dictionary];
         NSMutableArray *list = [NSMutableArray array];
         NSArray *results = [changes valueForKey:@"results"];
@@ -350,23 +368,12 @@
         [changeFetcher release];
         changeFetcher = nil;
         
-        // report completion if no changes were detected
-        if([list count] == 0) {
-            [self completed];
-            return;
-        }
-        
         // download changed documents
         for(CouchDBSyncerDocument *doc in list) {
             [self fetchDocument:doc];
         }
         
-        if(bulkFetcher) {
-            // start the bulk fetcher
-            [fetchQueue addOperation:bulkFetcher];
-            [bulkFetcher release];
-            bulkFetcher = nil;
-        }
+        [self enqueueBulkFetch];
         
         // download unfetched attachments.
         NSArray *staleAttachments = [store staleAttachments:database];
@@ -393,7 +400,9 @@
             CouchDBSyncerBulkFetch *bfetch = (CouchDBSyncerBulkFetch *)fetcher;
             for(CouchDBSyncerDocument *document in bfetch.documents) {
                 [store update:context document:document];
-                
+                countFin++;
+                countFinDoc++;
+
                 // download attachments. 
                 [self fetchDocument:document attachments:document.attachments];
             }
@@ -405,11 +414,14 @@
             bytesAtt += len;
             
             [store update:context attachment:att];
+            countFin++;
+            countFinAtt++;
         }
         else if(fetcher.fetchType == CouchDBSyncerFetchTypeDBInfo) {
             // fetched db info
             CouchDBSyncerObject *dbinfo = [[CouchDBSyncerObject alloc] initWithDictionary:[fetcher dictionary]];
             [dbinfo release];
+            countFin++;
         }
         
         bytes += len;
