@@ -10,8 +10,8 @@ External requirements:
 Installation
 ------------
 
-    > git clone git://github.com/2moro/couchdbsyncer.git
-    > cd couchdbsyncer
+    > git clone git://github.com/2moro/CouchDBSyncer-iOS.git
+    > cd CouchDBSyncer-iOS
     > git submodule init
     > git submodule update
 
@@ -69,33 +69,28 @@ A variant of the update method of CouchDBSyncer accepts an object implementing t
 This can be used to download documents/attachments selectively, or with different priorities.
 
 e.g.
-    [syncer update:self];  // assumes self implements the CouchDBSyncerDownloadPolicy protocol
+    // assumes self implements the CouchDBSyncerDownloadPolicyDelegate protocol
+    syncer.downloadPolicyDelegate = self;
+    [syncer update];
 
 The default is to download all documents and attachments.  By default, documents are downloaded with priority NSOperationQueuePriorityNormal, and attachments
 are downloaded with priority NSOperationQueuePriorityLow.
-To change the download policy for a given document or attachment, the protocol method should modify the provided policy object.
-For example, to only download attachments less than 1MB in size, and to download text attachments with high priority:
 
-    - (void)couchDBSyncerStore:(CouchDBSyncerStore *)store attachment:(CouchDBSyncerAttachment *)att policy:(CouchDBSyncerStorePolicy *)policy {
-        policy.download = att.length < (1024 * 1024) ? YES : NO;
-        policy.priority = [att.contentType hasPrefix:@"text/"] ? NSOperationQueuePriorityHigh : NSOperationQueuePriorityLow;
-    }
-
-Metadata for attachments that are not downloaded is stored in the database, and is accessible via the attachments method of MOCouchDBSyncerDocument.
-(This allows attachments to be accessed later if required).  If an attachment has newer content on the server, its unfetchedChanges attribute will be true.
+Metadata for attachments that are not downloaded is stored in the database, and is accessible via the attachments method of CouchDBSyncerDocument.
+(This allows attachments to be accessed later if required).  If an attachment has newer content on the server, its stale attribute will be true.
 
 Accessing databases / documents / attachments
 ---------------------------------------------
 
-see CouchDBSyncerStore.h for public API methods.
+see CouchDBSyncerStore.h for the full list of public API methods.
 
 documents can be accessed using the following methods of CouchDBSyncerStore.
 
-    - (NSArray *)documents;
-    - (NSArray *)documentsOfType:(NSString *)type;
-    - (NSArray *)documentsMatching:(NSPredicate *)predicate;
+    - (NSArray *)documents:(CouchDBSyncerDatabase *)database;
+    - (NSArray *)documents:(CouchDBSyncerDatabase *)database matching:(NSPredicate *)predicate;
+    - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
 
-The above methods return arrays of MOCouchDBSyncerDocument objects.  The dictionary method of MOCouchDBSyncerDocument can be used to access the 
+The above methods return arrays of CouchDBSyncerDocument objects.  The dictionary method of CouchDBSyncerDocument can be used to access the 
 document contents as an NSDictionary (converted from JSON).
 The attachments method of MOCouchDBSyncerDocument returns an NSArray of attachments (MOCouchDBSyncerAttachment records) associated with the document.
 

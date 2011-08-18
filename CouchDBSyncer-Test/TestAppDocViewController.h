@@ -7,18 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MOCouchDBSyncerDocument.h"
-
+#import "CouchDBSyncerDocument.h"
 
 @interface TestAppDocViewController : UIViewController {
-	MOCouchDBSyncerDocument *document;
+	CouchDBSyncerDocument *document;
 	UIScrollView *scrollView;
 	UILabel *labelContent;
 }
 
 @property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, retain) IBOutlet UILabel *labelContent;
+@property (nonatomic, retain) CouchDBSyncerDocument *document;
 
-- (id)initWithDocument:(MOCouchDBSyncerDocument *)doc;
+- (id)initWithDocument:(CouchDBSyncerDocument *)doc;
 
 @end

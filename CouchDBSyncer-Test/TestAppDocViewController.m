@@ -7,17 +7,22 @@
 //
 
 #import "TestAppDocViewController.h"
-#import "MOCouchDBSyncerAttachment.h"
+#import "CouchDBSyncerAttachment.h"
 
 @implementation TestAppDocViewController
 
-@synthesize scrollView, labelContent;
+@synthesize scrollView, labelContent, document;
 
-- (id)initWithDocument:(MOCouchDBSyncerDocument *)doc {
+- (id)initWithDocument:(CouchDBSyncerDocument *)doc {
 	if(self = [super initWithNibName:@"TestAppDocViewController" bundle:nil]) {
 		document = [doc retain];
 	}
 	return self;
+}
+
+- (void)dealloc {
+	[document release];
+    [super dealloc];
 }
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
@@ -35,18 +40,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    LOG(@"document: %@ content: %@", document.documentId, [document.dictionary description]);
+    
 	NSString *content = [NSString stringWithFormat:@"Content:\n%@", [document.dictionary description]];
 	self.title = document.documentId;
 
 	if([document.attachments count]) {
 		NSMutableString *attachmentInfo = [NSMutableString string];
 		[attachmentInfo appendFormat:@"\nAttachments:\n"];
-		for(MOCouchDBSyncerAttachment *att in document.attachments) {
-			[attachmentInfo appendFormat:@"%@ (%@ bytes)\n", att.filename, att.length];
+		for(CouchDBSyncerAttachment *att in document.attachments) {
+			[attachmentInfo appendFormat:@"%@ (%d bytes)\n", att.filename, att.length];
 		}
 		content = [content stringByAppendingString:attachmentInfo];
 	}
-	
+    
 	labelContent.text = content;
 	CGSize maxSize = CGSizeMake(260, 9999);
     CGSize size = [labelContent.text sizeWithFont:labelContent.font 
@@ -81,11 +88,6 @@
     // e.g. self.myOutlet = nil;
 }
 
-
-- (void)dealloc {
-	[document release];
-    [super dealloc];
-}
 
 
 @end

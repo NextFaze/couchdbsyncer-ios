@@ -7,25 +7,28 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CouchDBSyncerStore.h"
 #import "CouchDBSyncer.h"
+#import "CouchDBSyncerStore.h"
+#import "CouchDBSyncerDatabase.h"
 
-@interface TestAppViewController : UIViewController <UITextFieldDelegate> {	
-	UITextField *tfServer, *tfDocsPerReq;
+@interface TestAppDatabaseViewController : UIViewController <UITextFieldDelegate, CouchDBSyncerDelegate> {	
+	UITextField *tfDocsPerReq, *tfUsername, *tfPassword;
 	UIButton *buttonSync, *buttonReset, *buttonDocs;
 	UILabel *labelStatus, *labelDocs;
 	UIProgressView *progressView1, *progressView2, *progressView3;
 
     CouchDBSyncer *syncer;
+    CouchDBSyncerDatabase *database;
 }
 
-@property (nonatomic, retain) CouchDBSyncer *syncer;
+@property (nonatomic, retain) CouchDBSyncerDatabase *database;
 
 @property (nonatomic, retain) IBOutlet UILabel *labelStatus, *labelDocs;
 @property (nonatomic, retain) IBOutlet UIButton *buttonSync, *buttonReset, *buttonDocs;
-@property (nonatomic, retain) IBOutlet UITextField *tfServer, *tfDocsPerReq;
+@property (nonatomic, retain) IBOutlet UITextField *tfDocsPerReq, *tfUsername, *tfPassword;
 @property (nonatomic, retain) IBOutlet UIProgressView *progressView1, *progressView2, *progressView3;
 
+- (id)initWithDatabase:(CouchDBSyncerDatabase *)database;
 - (IBAction)buttonPressed:(id)sender;
 
 @end

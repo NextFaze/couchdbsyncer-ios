@@ -27,7 +27,6 @@
 }
 
 - (void)dealloc {
-    //LOG(@"dealloc");
     [documentId release];
     [revision release];
     [attachments release];
@@ -45,6 +44,30 @@
     return documentId;
 }
 
+- (id)valueForKey:(NSString *)key {
+    return [dictionary valueForKey:key];
+}
+- (NSString *)stringValueForKey:(NSString *)key {
+    return [NSString stringWithFormat:@"%@", [dictionary valueForKey:key]];
+}
+
+- (NSNumber *)numberValueForKey:(NSString *)key {
+    id val = [self valueForKey:key];
+    if([val isKindOfClass:[NSNumber class]]) {
+        return val;
+    } else {
+        return nil;
+    }
+}
+
+- (int)intValueForKey:(NSString *)key {
+    return [[self stringValueForKey:key] intValue];
+}
+
+- (float)floatValueForKey:(NSString *)key {
+    return [[self stringValueForKey:key] floatValue];
+}
+
 #pragma mark -
 
 - (void)setDictionary:(NSDictionary *)dict {
@@ -56,7 +79,7 @@
     
     NSDictionary *attlist = [dictionary valueForKey:@"_attachments"];
     
-    NSMutableArray *list = [NSMutableArray array];
+    NSMutableArray *list = [[NSMutableArray alloc] init];
     for(NSString *fname in [attlist allKeys]) {
         CouchDBSyncerAttachment *a = [[CouchDBSyncerAttachment alloc] init];
         NSDictionary *attdata = [attlist valueForKey:fname];
@@ -66,12 +89,11 @@
         a.revpos = [[attdata valueForKey:@"revpos"] intValue];
         a.documentId = documentId;
         a.deleted = deleted;
-        a.document = self;
         [list addObject:a];
         [a release];
     }
     [attachments release];
-    attachments = [list retain];
+    attachments = list;
 }
 
 @end

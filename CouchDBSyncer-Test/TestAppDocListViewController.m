@@ -33,6 +33,11 @@
 	return self;
 }
 
+- (void)dealloc {
+	[documents release];
+    [super dealloc];
+}
+
 #pragma mark -
 #pragma mark View lifecycle
 
@@ -116,7 +121,6 @@
 }
 */
 
-
 /*
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -152,7 +156,7 @@
 #pragma mark Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	MOCouchDBSyncerDocument *doc = [documents objectAtIndex:indexPath.row];
+	CouchDBSyncerDocument *doc = [documents objectAtIndex:indexPath.row];
 	TestAppDocViewController *vc = [[TestAppDocViewController alloc] initWithDocument:doc];
 	[self.navigationController pushViewController:vc animated:YES];
 	[vc release];
@@ -173,11 +177,6 @@
     // For example: self.myOutlet = nil;
 }
 
-
-- (void)dealloc {
-	[documents release];
-    [super dealloc];
-}
 
 
 @end

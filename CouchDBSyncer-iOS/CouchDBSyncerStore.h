@@ -8,12 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#import "MOCouchDBSyncerDatabase.h"
-#import "MOCouchDBSyncerDocument.h"
-#import "MOCouchDBSyncerAttachment.h"
-#import "CouchDBSyncerDownloadPolicy.h"
 #import "CouchDBSyncerDatabase.h"
 #import "CouchDBSyncerUpdateContext.h"
+#import "CouchDBSyncerDocument.h"
+#import "CouchDBSyncerAttachment.h"
 
 @interface CouchDBSyncerStore : NSObject {
     NSString *modelTypeKey;
@@ -45,10 +43,11 @@
 // remove the specified database completely
 - (void)destroy:(CouchDBSyncerDatabase *)database;
 
-- (NSDictionary *)statistics;
+- (NSDictionary *)statistics:(CouchDBSyncerDatabase *)database;
 
 // get database with given name
 - (CouchDBSyncerDatabase *)database:(NSString *)name;
+- (NSArray *)databases;
 
 // get database with the given name. if the database is not found locally, creates a new database with the 
 // given name and url.
@@ -60,6 +59,7 @@
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type tagged:(NSString *)tag;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database tagged:(NSString *)tag;
+- (CouchDBSyncerDocument *)document:(CouchDBSyncerDatabase *)database documentId:(NSString *)documentId;
 
 // get document types (array of NSString)
 - (NSArray *)documentTypes:(CouchDBSyncerDatabase *)database;
@@ -68,13 +68,17 @@
 - (NSArray *)attachments:(CouchDBSyncerDocument *)document;
 
 // get attachment
-- (CouchDBSyncerAttachment *)atachment:(CouchDBSyncerDocument *)document named:(NSString *)name;
+- (CouchDBSyncerAttachment *)attachment:(CouchDBSyncerDocument *)document named:(NSString *)name;
 
 // update methods
 // used by couchdbsyncer
 // get an update context for the given database and current thread
 - (CouchDBSyncerUpdateContext *)updateContext:(CouchDBSyncerDatabase *)database;
+- (void)update:(CouchDBSyncerUpdateContext *)context database:(CouchDBSyncerDatabase *)database;
 - (void)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document;
 - (void)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment;
+
+// returns a list of all stale attachments (need downloading)
+- (NSArray *)staleAttachments:(CouchDBSyncerDatabase *)database;
 
 @end

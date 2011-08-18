@@ -13,6 +13,12 @@
 		4965F04113FB8BA4006CA79F /* TestApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 4965F03F13FB8BA3006CA79F /* TestApplication.m */; };
 		4965F04613FB9CDC006CA79F /* CouchDBSyncerUpdateContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 4965F04413FB9CDA006CA79F /* CouchDBSyncerUpdateContext.h */; };
 		4965F04713FB9CDC006CA79F /* CouchDBSyncerUpdateContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4965F04513FB9CDB006CA79F /* CouchDBSyncerUpdateContext.m */; };
+		B50FFB6413FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = B50FFB6213FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.h */; };
+		B50FFB6513FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = B50FFB6313FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.m */; };
+		B50FFB6913FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.h in Headers */ = {isa = PBXBuildFile; fileRef = B50FFB6713FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.h */; };
+		B50FFB6A13FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = B50FFB6813FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.m */; };
+		B50FFB6E13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = B50FFB6C13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.h */; };
+		B50FFB6F13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = B50FFB6D13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.m */; };
 		B54F1B7F13CAD64000F9F874 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54F1B7E13CAD64000F9F874 /* Foundation.framework */; };
 		B54F1BAA13CAD70600F9F874 /* NSDataAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B8913CAD70600F9F874 /* NSDataAdditions.h */; };
 		B54F1BAB13CAD70600F9F874 /* NSDataAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */; };
@@ -34,13 +40,6 @@
 		B54F1BBC13CAD70600F9F874 /* CouchDBSyncerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */; };
 		B54F1BBF13CAD70600F9F874 /* CouchDBSyncerStore.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */; };
 		B54F1BC013CAD70600F9F874 /* CouchDBSyncerStore.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */; };
-		B54F1BC113CAD70600F9F874 /* CouchDBSyncerDownloadPolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA113CAD70600F9F874 /* CouchDBSyncerDownloadPolicy.h */; };
-		B54F1BC313CAD70600F9F874 /* MOCouchDBSyncerAttachment.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */; };
-		B54F1BC413CAD70600F9F874 /* MOCouchDBSyncerAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */; };
-		B54F1BC513CAD70600F9F874 /* MOCouchDBSyncerDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */; };
-		B54F1BC613CAD70600F9F874 /* MOCouchDBSyncerDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */; };
-		B54F1BC713CAD70600F9F874 /* MOCouchDBSyncerDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */; };
-		B54F1BC813CAD70600F9F874 /* MOCouchDBSyncerDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */; };
 		B54F1BE513CAD76000F9F874 /* NSObject+SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BCC13CAD76000F9F874 /* NSObject+SBJson.h */; };
 		B54F1BE613CAD76000F9F874 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1BCD13CAD76000F9F874 /* NSObject+SBJson.m */; };
 		B54F1BE713CAD76000F9F874 /* SBJson.h in Headers */ = {isa = PBXBuildFile; fileRef = B54F1BCE13CAD76000F9F874 /* SBJson.h */; };
@@ -75,16 +74,21 @@
 		B55C283613CADC78000412E6 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C283413CADC78000412E6 /* MainWindow.xib */; };
 		B55C284D13CADD17000412E6 /* TestAppDocListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284313CADD17000412E6 /* TestAppDocListViewController.h */; };
 		B55C284F13CADD17000412E6 /* TestAppDocViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284513CADD17000412E6 /* TestAppDocViewController.h */; };
-		B55C285113CADD17000412E6 /* TestAppViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284813CADD17000412E6 /* TestAppViewController.h */; };
+		B55C285113CADD17000412E6 /* TestAppDatabaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B55C284813CADD17000412E6 /* TestAppDatabaseViewController.h */; };
 		B55C285313CADE25000412E6 /* TestAppDocListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284413CADD17000412E6 /* TestAppDocListViewController.m */; };
 		B55C285413CADE28000412E6 /* TestAppDocViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284613CADD17000412E6 /* TestAppDocViewController.m */; };
 		B55C285513CADE2E000412E6 /* TestAppDocViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C284713CADD17000412E6 /* TestAppDocViewController.xib */; };
-		B55C285613CADE32000412E6 /* TestAppViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284913CADD17000412E6 /* TestAppViewController.m */; };
-		B55C285713CADE36000412E6 /* TestAppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C284A13CADD17000412E6 /* TestAppViewController.xib */; };
+		B55C285613CADE32000412E6 /* TestAppDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B55C284913CADD17000412E6 /* TestAppDatabaseViewController.m */; };
+		B55C285713CADE36000412E6 /* TestAppDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55C284A13CADD17000412E6 /* TestAppDatabaseViewController.xib */; };
 		B55C286213CADE79000412E6 /* NSDataAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = B54F1B8A13CAD70600F9F874 /* NSDataAdditions.m */; };
 		B55C286713CADEA5000412E6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B55C286613CADEA5000412E6 /* CoreData.framework */; };
 		B55C286B13CADF36000412E6 /* libCouchDBSyncer-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */; };
 		B55C28BC13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B55C28BA13CAE29F000412E6 /* CouchDBSyncer.xcdatamodeld */; };
+		B5A865C913FCA7040008A575 /* TestAppDatabaseListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A865C713FCA7040008A575 /* TestAppDatabaseListViewController.h */; };
+		B5A865CF13FCA7440008A575 /* TestAppEditDatabaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A865CC13FCA7440008A575 /* TestAppEditDatabaseViewController.h */; };
+		B5A865D113FCA7560008A575 /* TestAppEditDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B5A865CD13FCA7440008A575 /* TestAppEditDatabaseViewController.m */; };
+		B5A865D213FCA75B0008A575 /* TestAppDatabaseListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B5A865C813FCA7040008A575 /* TestAppDatabaseListViewController.m */; };
+		B5A865D413FCA7640008A575 /* TestAppEditDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5A865CE13FCA7440008A575 /* TestAppEditDatabaseViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +109,12 @@
 		4965F03F13FB8BA3006CA79F /* TestApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestApplication.m; sourceTree = "<group>"; };
 		4965F04413FB9CDA006CA79F /* CouchDBSyncerUpdateContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerUpdateContext.h; sourceTree = "<group>"; };
 		4965F04513FB9CDB006CA79F /* CouchDBSyncerUpdateContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerUpdateContext.m; sourceTree = "<group>"; };
+		B50FFB6213FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDocument.h; sourceTree = "<group>"; };
+		B50FFB6313FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDocument.m; sourceTree = "<group>"; };
+		B50FFB6713FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerAttachment.h; sourceTree = "<group>"; };
+		B50FFB6813FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerAttachment.m; sourceTree = "<group>"; };
+		B50FFB6C13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDatabase.h; sourceTree = "<group>"; };
+		B50FFB6D13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDatabase.m; sourceTree = "<group>"; };
 		B54F1B7B13CAD64000F9F874 /* libCouchDBSyncer-iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchDBSyncer-iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B54F1B7E13CAD64000F9F874 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B54F1B8213CAD64000F9F874 /* CouchDBSyncer-iOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CouchDBSyncer-iOS-Prefix.pch"; sourceTree = "<group>"; };
@@ -128,13 +138,6 @@
 		B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerObject.m; sourceTree = "<group>"; };
 		B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerStore.h; sourceTree = "<group>"; };
 		B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchDBSyncerStore.m; sourceTree = "<group>"; };
-		B54F1BA113CAD70600F9F874 /* CouchDBSyncerDownloadPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchDBSyncerDownloadPolicy.h; sourceTree = "<group>"; };
-		B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerAttachment.h; sourceTree = "<group>"; };
-		B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerAttachment.m; sourceTree = "<group>"; };
-		B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDatabase.h; sourceTree = "<group>"; };
-		B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDatabase.m; sourceTree = "<group>"; };
-		B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOCouchDBSyncerDocument.h; sourceTree = "<group>"; };
-		B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOCouchDBSyncerDocument.m; sourceTree = "<group>"; };
 		B54F1BCC13CAD76000F9F874 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJson.h"; sourceTree = "<group>"; };
 		B54F1BCD13CAD76000F9F874 /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJson.m"; sourceTree = "<group>"; };
 		B54F1BCE13CAD76000F9F874 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
@@ -175,11 +178,16 @@
 		B55C284513CADD17000412E6 /* TestAppDocViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppDocViewController.h; sourceTree = "<group>"; };
 		B55C284613CADD17000412E6 /* TestAppDocViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppDocViewController.m; sourceTree = "<group>"; };
 		B55C284713CADD17000412E6 /* TestAppDocViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppDocViewController.xib; sourceTree = "<group>"; };
-		B55C284813CADD17000412E6 /* TestAppViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppViewController.h; sourceTree = "<group>"; };
-		B55C284913CADD17000412E6 /* TestAppViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppViewController.m; sourceTree = "<group>"; };
-		B55C284A13CADD17000412E6 /* TestAppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppViewController.xib; sourceTree = "<group>"; };
+		B55C284813CADD17000412E6 /* TestAppDatabaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppDatabaseViewController.h; sourceTree = "<group>"; };
+		B55C284913CADD17000412E6 /* TestAppDatabaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppDatabaseViewController.m; sourceTree = "<group>"; };
+		B55C284A13CADD17000412E6 /* TestAppDatabaseViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppDatabaseViewController.xib; sourceTree = "<group>"; };
 		B55C286613CADEA5000412E6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		B55C28BB13CAE29F000412E6 /* CouchDBSyncer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CouchDBSyncer.xcdatamodel; sourceTree = "<group>"; };
+		B5A865C713FCA7040008A575 /* TestAppDatabaseListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppDatabaseListViewController.h; sourceTree = "<group>"; };
+		B5A865C813FCA7040008A575 /* TestAppDatabaseListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppDatabaseListViewController.m; sourceTree = "<group>"; };
+		B5A865CC13FCA7440008A575 /* TestAppEditDatabaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppEditDatabaseViewController.h; sourceTree = "<group>"; };
+		B5A865CD13FCA7440008A575 /* TestAppEditDatabaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAppEditDatabaseViewController.m; sourceTree = "<group>"; };
+		B5A865CE13FCA7440008A575 /* TestAppEditDatabaseViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestAppEditDatabaseViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,9 +222,14 @@
 				B55C284513CADD17000412E6 /* TestAppDocViewController.h */,
 				B55C284613CADD17000412E6 /* TestAppDocViewController.m */,
 				B55C284713CADD17000412E6 /* TestAppDocViewController.xib */,
-				B55C284813CADD17000412E6 /* TestAppViewController.h */,
-				B55C284913CADD17000412E6 /* TestAppViewController.m */,
-				B55C284A13CADD17000412E6 /* TestAppViewController.xib */,
+				B55C284813CADD17000412E6 /* TestAppDatabaseViewController.h */,
+				B55C284913CADD17000412E6 /* TestAppDatabaseViewController.m */,
+				B55C284A13CADD17000412E6 /* TestAppDatabaseViewController.xib */,
+				B5A865C713FCA7040008A575 /* TestAppDatabaseListViewController.h */,
+				B5A865C813FCA7040008A575 /* TestAppDatabaseListViewController.m */,
+				B5A865CC13FCA7440008A575 /* TestAppEditDatabaseViewController.h */,
+				B5A865CD13FCA7440008A575 /* TestAppEditDatabaseViewController.m */,
+				B5A865CE13FCA7440008A575 /* TestAppEditDatabaseViewController.xib */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -284,12 +297,12 @@
 			isa = PBXGroup;
 			children = (
 				B54F1B8D13CAD70600F9F874 /* CouchDBSyncer.xcdatamodeld */,
-				B54F1BA413CAD70600F9F874 /* MOCouchDBSyncerAttachment.h */,
-				B54F1BA513CAD70600F9F874 /* MOCouchDBSyncerAttachment.m */,
-				B54F1BA613CAD70600F9F874 /* MOCouchDBSyncerDatabase.h */,
-				B54F1BA713CAD70600F9F874 /* MOCouchDBSyncerDatabase.m */,
-				B54F1BA813CAD70600F9F874 /* MOCouchDBSyncerDocument.h */,
-				B54F1BA913CAD70600F9F874 /* MOCouchDBSyncerDocument.m */,
+				B50FFB6213FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.h */,
+				B50FFB6313FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.m */,
+				B50FFB6713FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.h */,
+				B50FFB6813FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.m */,
+				B50FFB6C13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.h */,
+				B50FFB6D13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.m */,
 			);
 			path = "Managed Objects";
 			sourceTree = "<group>";
@@ -316,7 +329,6 @@
 				B54F1B9C13CAD70600F9F874 /* CouchDBSyncerObject.m */,
 				B54F1B9F13CAD70600F9F874 /* CouchDBSyncerStore.h */,
 				B54F1BA013CAD70600F9F874 /* CouchDBSyncerStore.m */,
-				B54F1BA113CAD70600F9F874 /* CouchDBSyncerDownloadPolicy.h */,
 				4965F04413FB9CDA006CA79F /* CouchDBSyncerUpdateContext.h */,
 				4965F04513FB9CDB006CA79F /* CouchDBSyncerUpdateContext.m */,
 			);
@@ -400,10 +412,6 @@
 				B54F1BB913CAD70600F9F874 /* CouchDBSyncerFetch.h in Headers */,
 				B54F1BBB13CAD70600F9F874 /* CouchDBSyncerObject.h in Headers */,
 				B54F1BBF13CAD70600F9F874 /* CouchDBSyncerStore.h in Headers */,
-				B54F1BC113CAD70600F9F874 /* CouchDBSyncerDownloadPolicy.h in Headers */,
-				B54F1BC313CAD70600F9F874 /* MOCouchDBSyncerAttachment.h in Headers */,
-				B54F1BC513CAD70600F9F874 /* MOCouchDBSyncerDatabase.h in Headers */,
-				B54F1BC713CAD70600F9F874 /* MOCouchDBSyncerDocument.h in Headers */,
 				B54F1BE513CAD76000F9F874 /* NSObject+SBJson.h in Headers */,
 				B54F1BE713CAD76000F9F874 /* SBJson.h in Headers */,
 				B54F1BE813CAD76000F9F874 /* SBJsonParser.h in Headers */,
@@ -419,10 +427,15 @@
 				B54F1BFC13CAD76000F9F874 /* SBJsonWriter.h in Headers */,
 				B55C284D13CADD17000412E6 /* TestAppDocListViewController.h in Headers */,
 				B55C284F13CADD17000412E6 /* TestAppDocViewController.h in Headers */,
-				B55C285113CADD17000412E6 /* TestAppViewController.h in Headers */,
+				B55C285113CADD17000412E6 /* TestAppDatabaseViewController.h in Headers */,
 				491D288E13CF0256001A5DE4 /* CouchDBSyncerDatabase.h in Headers */,
 				4965F04013FB8BA4006CA79F /* TestApplication.h in Headers */,
 				4965F04613FB9CDC006CA79F /* CouchDBSyncerUpdateContext.h in Headers */,
+				B5A865C913FCA7040008A575 /* TestAppDatabaseListViewController.h in Headers */,
+				B5A865CF13FCA7440008A575 /* TestAppEditDatabaseViewController.h in Headers */,
+				B50FFB6413FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.h in Headers */,
+				B50FFB6913FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.h in Headers */,
+				B50FFB6E13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,7 +511,8 @@
 				B55C282D13CADC78000412E6 /* InfoPlist.strings in Resources */,
 				B55C283613CADC78000412E6 /* MainWindow.xib in Resources */,
 				B55C285513CADE2E000412E6 /* TestAppDocViewController.xib in Resources */,
-				B55C285713CADE36000412E6 /* TestAppViewController.xib in Resources */,
+				B55C285713CADE36000412E6 /* TestAppDatabaseViewController.xib in Resources */,
+				B5A865D413FCA7640008A575 /* TestAppEditDatabaseViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,9 +533,6 @@
 				B54F1BBA13CAD70600F9F874 /* CouchDBSyncerFetch.m in Sources */,
 				B54F1BBC13CAD70600F9F874 /* CouchDBSyncerObject.m in Sources */,
 				B54F1BC013CAD70600F9F874 /* CouchDBSyncerStore.m in Sources */,
-				B54F1BC413CAD70600F9F874 /* MOCouchDBSyncerAttachment.m in Sources */,
-				B54F1BC613CAD70600F9F874 /* MOCouchDBSyncerDatabase.m in Sources */,
-				B54F1BC813CAD70600F9F874 /* MOCouchDBSyncerDocument.m in Sources */,
 				B54F1BE613CAD76000F9F874 /* NSObject+SBJson.m in Sources */,
 				B54F1BE913CAD76000F9F874 /* SBJsonParser.m in Sources */,
 				B54F1BEB13CAD76000F9F874 /* SBJsonStreamParser.m in Sources */,
@@ -537,6 +548,9 @@
 				491D288F13CF0256001A5DE4 /* CouchDBSyncerDatabase.m in Sources */,
 				4965F04113FB8BA4006CA79F /* TestApplication.m in Sources */,
 				4965F04713FB9CDC006CA79F /* CouchDBSyncerUpdateContext.m in Sources */,
+				B50FFB6513FCEEB800C6BEC1 /* MOCouchDBSyncerDocument.m in Sources */,
+				B50FFB6A13FCEEB800C6BEC1 /* MOCouchDBSyncerAttachment.m in Sources */,
+				B50FFB6F13FCEEB800C6BEC1 /* MOCouchDBSyncerDatabase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,8 +563,10 @@
 				B55C283313CADC78000412E6 /* CouchDBSyncer_TestAppDelegate.m in Sources */,
 				B55C285313CADE25000412E6 /* TestAppDocListViewController.m in Sources */,
 				B55C285413CADE28000412E6 /* TestAppDocViewController.m in Sources */,
-				B55C285613CADE32000412E6 /* TestAppViewController.m in Sources */,
+				B55C285613CADE32000412E6 /* TestAppDatabaseViewController.m in Sources */,
 				B55C286213CADE79000412E6 /* NSDataAdditions.m in Sources */,
+				B5A865D113FCA7560008A575 /* TestAppEditDatabaseViewController.m in Sources */,
+				B5A865D213FCA75B0008A575 /* TestAppDatabaseListViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

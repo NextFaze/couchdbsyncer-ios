@@ -16,7 +16,9 @@
 
 @implementation CouchDBSyncerBulkFetch
 
-- (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d {
+@synthesize documents;
+
+- (id)initWithURL:(NSURL *)u delegate:(NSObject <CouchDBSyncerFetchDelegate> *)d {
     NSString *urlPath = [NSString stringWithFormat:@"%@/_all_docs?include_docs=true", u];
     if((self = [super initWithURL:[NSURL URLWithString:urlPath] delegate:d])) {
         fetchType = CouchDBSyncerFetchTypeBulkDocuments;

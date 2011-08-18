@@ -14,6 +14,8 @@
     NSMutableArray *documents;
 }
 
+@property (nonatomic, readonly) NSMutableArray *documents;
+
 - (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d;
 
 - (void)addDocument:(CouchDBSyncerDocument *)doc;

@@ -11,20 +11,21 @@
 
 @implementation CouchDBSyncerUpdateContext
 
-@synthesize managedObjectContext, database;
+@synthesize managedObjectContext, database, moDatabase;
 
-- (id)initWithContext:(NSManagedObjectContext *)context database:(CouchDBSyncerDatabase *)db {
+- (id)initWithContext:(NSManagedObjectContext *)context {
     self = [super init];
     if(self) {
         managedObjectContext = [context retain];
-        database = [db retain];
     }
     return self;
 }
 
 - (void)dealloc {
     [managedObjectContext release];
+    [moDatabase release];
     [database release];
+    
     [super dealloc];
 }
 

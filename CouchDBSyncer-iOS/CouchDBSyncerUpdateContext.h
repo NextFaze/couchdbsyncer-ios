@@ -14,11 +14,13 @@
 @interface CouchDBSyncerUpdateContext : NSObject {
     NSManagedObjectContext *managedObjectContext;
     MOCouchDBSyncerDatabase *moDatabase;
+    CouchDBSyncerDatabase *database;
 }
 
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, readonly) MOCouchDBSyncerDatabase *database;
+@property (nonatomic, retain) MOCouchDBSyncerDatabase *moDatabase;
+@property (nonatomic, retain) CouchDBSyncerDatabase *database;
 
-- (id)initWithContext:(NSManagedObjectContext *)context database:(CouchDBSyncerDatabase *)database;
+- (id)initWithContext:(NSManagedObjectContext *)context;
 
 @end

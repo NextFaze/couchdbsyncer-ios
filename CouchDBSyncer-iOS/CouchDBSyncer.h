@@ -14,18 +14,22 @@
 #import "CouchDBSyncerBulkFetch.h"
 #import "CouchDBSyncerStore.h"
 #import "CouchDBSyncerDatabase.h"
-#import "CouchDBSyncerDownloadPolicy.h"
+
+@protocol CouchDBSyncerDelegate;
+@protocol CouchDBSyncerDownloadPolicyDelegate;
 
 @interface CouchDBSyncer : NSObject <CouchDBSyncerFetchDelegate> {
-    NSObject<CouchDBSyncerDownloadPolicy> *downloadPolicy;
+    NSObject<CouchDBSyncerDownloadPolicyDelegate> *downloadPolicyDelegate;
+    NSObject<CouchDBSyncerDelegate> *delegate;
+    
     CouchDBSyncerDatabase *database;
     CouchDBSyncerStore *store;
     
     NSThread *fetchThread;
     CouchDBSyncerFetch *changeFetcher;
-    NSOperationQueue *responseQueue;    // queue of responses, returns responses in ascending sequence id order
     NSOperationQueue *fetchQueue;       // SyncerFetch objects go here when ready to be fetched
     NSDate *startedAt;
+    NSString *username, *password;
     
     BOOL aborted, running, changesReported;
     
@@ -42,9 +46,11 @@
 }
 
 @property (nonatomic, readonly) int bytes, bytesDoc, bytesAtt, countReq, countFin, countHttpFin;
+@property (nonatomic, retain) NSString *username, *password;
 @property (nonatomic, assign) int docsPerRequest, maxConcurrentFetches;
 @property (nonatomic, readonly) NSDate *startedAt;
-@property (nonatomic, retain) NSObject<CouchDBSyncerDownloadPolicy> *downloadPolicy;
+@property (nonatomic, assign) NSObject<CouchDBSyncerDownloadPolicyDelegate> *downloadPolicyDelegate;
+@property (nonatomic, assign) NSObject<CouchDBSyncerDelegate> *delegate;
 
 - (id)initWithStore:(CouchDBSyncerStore *)store database:(CouchDBSyncerDatabase *)database;
 
@@ -55,5 +61,23 @@
 - (float)progress;
 - (float)progressDocuments;
 - (float)progressAttachments;
+
+@end
+
+@protocol CouchDBSyncerDownloadPolicyDelegate <NSObject>
+
+@optional
+- (BOOL)couchDBSyncerDownloadPolicyDocument:(CouchDBSyncerDocument *)document;
+- (BOOL)couchDBSyncerDownloadPolicyAttachment:(CouchDBSyncerAttachment *)attachment;
+- (NSOperationQueuePriority)couchDBSyncerDownloadPolicyDocumentPriority:(CouchDBSyncerDocument *)document;
+- (NSOperationQueuePriority)couchDBSyncerDownloadPolicyAttachmentPriority:(CouchDBSyncerAttachment *)attachment;
+
+@end
+
+@protocol CouchDBSyncerDelegate <NSObject>
+
+- (void)couchDBSyncerProgress:(CouchDBSyncer *)s;
+- (void)couchDBSyncerCompleted:(CouchDBSyncer *)s;
+- (void)couchDBSyncerFailed:(CouchDBSyncer *)s;
 
 @end

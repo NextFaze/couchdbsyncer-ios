@@ -6,25 +6,41 @@
 //  Copyright 2011 2moro mobile. All rights reserved.
 //
 
-#import "TestAppViewController.h"
+#import "TestAppDatabaseViewController.h"
 #import "TestAppDocListViewController.h"
+#import "TestAppEditDatabaseViewController.h"
 #import "TestApplication.h"
 
 #define TestAppServerName @"ServerName"
 #define TestAppDocsPerReq @"DocsPerReq"
 
-@implementation TestAppViewController
+@implementation TestAppDatabaseViewController
 
-@synthesize tfServer, tfDocsPerReq;
+@synthesize tfDocsPerReq, tfUsername, tfPassword;
 @synthesize buttonDocs, buttonReset, buttonSync, labelStatus, labelDocs, progressView1, progressView2, progressView3;
-@synthesize syncer;
+@synthesize database;
+
+- (CouchDBSyncerStore *)store {
+    return [[TestApplication sharedApplication] dataStore];
+}
+
+#pragma mark -
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization.
-        syncer = [[CouchDBSyncer alloc] init];
+    }
+    return self;
+}
+
+- (id)initWithDatabase:(CouchDBSyncerDatabase *)db {
+    self = [self initWithNibName:@"TestAppDatabaseViewController" bundle:nil];
+    if(self) {
+        self.database = db;
+        syncer = [[CouchDBSyncer alloc] initWithStore:[self store] database:db];
+        syncer.delegate = self;
     }
     return self;
 }
@@ -38,30 +54,54 @@
     self.progressView1 = nil;
     self.progressView2 = nil;
     self.progressView3 = nil;
-    self.tfServer = nil;
     self.tfDocsPerReq = nil;
+    self.tfUsername = nil;
+    self.tfPassword = nil;
 }
 
 - (void)dealloc {
-    [self deallocView];    
+    [self deallocView];
+    [syncer abort];
+    [syncer release];
+    [database release];
+    
     [super dealloc];
 }
 
 #pragma mark -
 
-- (CouchDBSyncerStore *)store {
-    TestApplication *app = (TestApplication *)[UIApplication sharedApplication];
-    return app.dataStore;
+- (NSDictionary *)fetchCredentials {
+    NSData *data = [[NSUserDefaults standardUserDefaults] valueForKey:@"Credentials"];
+    NSDictionary *dict = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    return dict;
+}
+
+- (void)loadCredentials {
+    NSDictionary *dict = [[self fetchCredentials] valueForKey:database.name];
+    if(dict) {
+        tfUsername.text = [dict valueForKey:@"username"];
+        tfPassword.text = [dict valueForKey:@"password"];
+    }
+}
+
+- (void)saveCredentials {
+    NSDictionary *dict = [self fetchCredentials];
+    NSMutableDictionary *new = dict ? [NSMutableDictionary dictionaryWithDictionary:dict] : [NSMutableDictionary dictionary];
+    NSDictionary *cred = [NSDictionary dictionaryWithObjectsAndKeys:tfUsername.text, @"username", tfPassword.text, @"password", nil];
+    [new setValue:cred forKey:database.name];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:new];
+    [[NSUserDefaults standardUserDefaults] setValue:data forKey:@"Credentials"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)updateProgress {
-	progressView1.progress = [store.syncer progressDocuments];
-	progressView2.progress = [store.syncer progressAttachments];
-	progressView3.progress = [store.syncer progress];
+	progressView1.progress = [syncer progressDocuments];
+	progressView2.progress = [syncer progressAttachments];
+	progressView3.progress = [syncer progress];
 }
 
 - (void)updateStats {
-	NSDictionary *stats = [store statistics];
+	NSDictionary *stats = [[self store] statistics];
 	NSMutableString *str = [NSMutableString string];
 	for(NSString *key in [stats allKeys]) {
 		[str appendFormat:@"%@: %@\n", key, [stats valueForKey:key]];
@@ -75,22 +115,25 @@
 }
 
 - (IBAction)buttonPressed:(id)sender {
+    CouchDBSyncerStore *store = [self store];
 	if(sender == buttonDocs) {
-        NSArray *documents = [store documents];
-		TestAppDocListViewController *vc = [[TestAppDocListViewController alloc] initWithDocuments:documents];
+        NSArray *docs = [store documents:database];
+		TestAppDocListViewController *vc = [[TestAppDocListViewController alloc] initWithDocuments:docs];
 		[self.navigationController pushViewController:vc animated:YES];
 		[vc release];
 	}
 	else if(sender == buttonReset) {
-		[store purge];
+		[[self store] purge:database];
 		[self updateStats];
 		[self setStatus:@"inactive"];
 		progressView1.progress = progressView2.progress = progressView3.progress = 0;
 	}
 	else if(sender == buttonSync) {
-		store.serverPath = tfServer.text;
 		[self setStatus:@"syncing"];
-		[store fetchChanges];
+        syncer.username = tfUsername.text;
+        syncer.password = tfPassword.text;
+        [self saveCredentials];
+        [syncer update];
 	}
 }
 
@@ -106,9 +149,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
-	tfServer.text = [[NSUserDefaults standardUserDefaults] valueForKey:TestAppServerName];
 	tfDocsPerReq.text = [[NSUserDefaults standardUserDefaults] valueForKey:TestAppDocsPerReq];
 
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editDatabase:)];
+    self.navigationItem.rightBarButtonItem = item;
+    [item release];
+ 
+    [self loadCredentials];
+    
+    self.title = database.name;
+    
 	[self updateProgress];
 	[self updateStats];
 }
@@ -143,35 +193,40 @@
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-	if(textField == tfServer) {
-		// save value
-		[[NSUserDefaults standardUserDefaults] setValue:tfServer.text forKey:TestAppServerName];
-	}
-    else if(textField == tfDocsPerReq) {
+	if(textField == tfDocsPerReq) {
 		[[NSUserDefaults standardUserDefaults] setValue:tfDocsPerReq.text forKey:TestAppDocsPerReq];        
         syncer.docsPerRequest = [tfDocsPerReq.text intValue];
     }
 }
 
-#pragma mark CouchDBSyncerStoreDelegate
+#pragma mark CouchDBSyncerDelegate
 
-- (void)couchDBSyncerStoreProgress:(CouchDBSyncerStore *)s {
+- (void)couchDBSyncerProgress:(CouchDBSyncer *)s {
 	[self updateProgress];
 	[self updateStats];
 }
 
-- (void)couchDBSyncerStoreCompleted:(CouchDBSyncerStore *)s {
+- (void)couchDBSyncerCompleted:(CouchDBSyncer *)s {
 	[self updateProgress];
 	[self updateStats];
 	[self setStatus:@"complete"];
     
-    LOG(@"complete, progress: %.2f, %.2f, %.2f", [store.syncer progressDocuments], [store.syncer progressAttachments], [store.syncer progress]);
+    LOG(@"complete, progress: %.2f, %.2f, %.2f", [syncer progressDocuments], [syncer progressAttachments], [syncer progress]);
 }
 
-- (void)couchDBSyncerStoreFailed:(CouchDBSyncerStore *)s {
+- (void)couchDBSyncerFailed:(CouchDBSyncer *)s {
 	[self updateProgress];
 	[self updateStats];
 	[self setStatus:@"failure"];
+}
+
+#pragma mark -
+
+- (void)editDatabase:(id)sender {
+    TestAppEditDatabaseViewController *vc = [[TestAppEditDatabaseViewController alloc] init];
+    vc.database = database;
+    [self.navigationController pushViewController:vc animated:YES];
+    [vc release];
 }
 
 @end

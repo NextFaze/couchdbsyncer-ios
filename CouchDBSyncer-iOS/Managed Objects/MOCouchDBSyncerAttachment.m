@@ -1,12 +1,13 @@
 //
 //  MOCouchDBSyncerAttachment.m
-//  CouchDBSyncer
+//  CouchDBSyncer-iOS
 //
-//  Created by Andrew on 19/03/11.
+//  Created by Andrew Williams on 18/08/11.
 //  Copyright (c) 2011 2moro mobile. All rights reserved.
 //
 
 #import "MOCouchDBSyncerAttachment.h"
+#import "MOCouchDBSyncerDatabase.h"
 #import "MOCouchDBSyncerDocument.h"
 
 
@@ -15,10 +16,12 @@
 @dynamic content;
 @dynamic length;
 @dynamic contentType;
+@dynamic stale;
 @dynamic filename;
 @dynamic documentId;
-@dynamic unfetchedChanges;
 @dynamic document;
+@dynamic database;
+
 
 
 @end

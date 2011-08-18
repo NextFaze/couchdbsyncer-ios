@@ -13,6 +13,10 @@
 
 @synthesize dataStore;
 
++ (TestApplication *)sharedApplication {
+    return (TestApplication *)[super sharedApplication];
+}
+
 - (id)init {
     self = [super init];
     if(self) {

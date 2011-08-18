@@ -25,4 +25,11 @@
 - (void)setDictionary:(NSDictionary *)dict;
 - (BOOL)isDesignDocument;
 
+// data accessors
+- (id)valueForKey:(NSString *)key;
+- (NSString *)stringValueForKey:(NSString *)key;
+- (NSNumber *)numberValueForKey:(NSString *)key;
+- (int)intValueForKey:(NSString *)key;
+- (float)floatValueForKey:(NSString *)key;
+
 @end

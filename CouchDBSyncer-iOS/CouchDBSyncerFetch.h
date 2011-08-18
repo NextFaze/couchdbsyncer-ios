@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CouchDBSyncerObject.h"
+#import "CouchDBSyncerDocument.h"
+#import "CouchDBSyncerAttachment.h"
 
 typedef enum {
     CouchDBSyncerFetchTypeUnknown,
@@ -27,8 +30,10 @@ typedef enum {
     BOOL isExecuting, isFinished;
     NSString *username, *password;
     CouchDBSyncerFetchType fetchType;
-        
-    id<CouchDBSyncerFetchDelegate> delegate;
+    CouchDBSyncerDocument *document;
+    CouchDBSyncerAttachment *attachment;
+    
+    NSObject<CouchDBSyncerFetchDelegate> *delegate;
 }
 
 @property (nonatomic, assign) CouchDBSyncerFetchType fetchType;
@@ -36,8 +41,10 @@ typedef enum {
 @property (nonatomic, retain) NSURL *url;
 @property (nonatomic, readonly) BOOL isExecuting, isFinished;
 @property (nonatomic, retain) NSString *username, *password;
+@property (nonatomic, retain) CouchDBSyncerDocument *document;
+@property (nonatomic, retain) CouchDBSyncerAttachment *attachment;
 
-- (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d;
+- (id)initWithURL:(NSURL *)u delegate:(NSObject<CouchDBSyncerFetchDelegate> *)d;
 
 - (void)fetch;
 - (NSData *)data;

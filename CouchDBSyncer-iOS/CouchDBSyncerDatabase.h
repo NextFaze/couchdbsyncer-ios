@@ -8,14 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface CouchDBSyncerDatabase : NSObject {
     NSString *name;
     int sequenceId;
     NSURL *url;
 }
 
-@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, retain) NSString *name;
 @property (nonatomic, assign) int sequenceId;
 @property (nonatomic, retain) NSURL *url;
 

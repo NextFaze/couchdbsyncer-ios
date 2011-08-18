@@ -15,4 +15,6 @@
 
 @property (nonatomic, readonly) CouchDBSyncerStore *dataStore;
 
++ (TestApplication *)sharedApplication;
+
 @end

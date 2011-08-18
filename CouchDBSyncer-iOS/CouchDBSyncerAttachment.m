@@ -11,15 +11,13 @@
 
 @implementation CouchDBSyncerAttachment
 
-@synthesize contentType, filename, length, revpos, deleted, documentId, content, document;
+@synthesize contentType, filename, length, revpos, deleted, documentId, content, stale;
 
 - (void)dealloc {
-    //LOG(@"dealloc");
     [contentType release];
     [filename release];
     [documentId release];
     [content release];
-    // document is a weak link
     
     [super dealloc];
 }

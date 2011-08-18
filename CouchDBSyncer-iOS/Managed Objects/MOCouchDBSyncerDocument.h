@@ -1,41 +1,26 @@
 //
 //  MOCouchDBSyncerDocument.h
-//  CouchDBSyncer
+//  CouchDBSyncer-iOS
 //
-//  Created by ASW on 27/02/11.
-//  Copyright 2011 2moro mobile. All rights reserved.
+//  Created by Andrew Williams on 18/08/11.
+//  Copyright (c) 2011 2moro mobile. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-@class MOCouchDBSyncerAttachment;
-@class MOCouchDBSyncerDatabase;
+@class MOCouchDBSyncerAttachment, MOCouchDBSyncerDatabase;
 
-@interface MOCouchDBSyncerDocument :  NSManagedObject  
-{
+@interface MOCouchDBSyncerDocument : NSManagedObject {
+@private
 }
-
 @property (nonatomic, retain) NSString * revision;
-@property (nonatomic, retain) NSData * dictionaryData;
 @property (nonatomic, retain) NSString * parentId;
+@property (nonatomic, retain) NSData * dictionaryData;
 @property (nonatomic, retain) NSString * type;
-@property (nonatomic, retain) NSString * tags;
 @property (nonatomic, retain) NSString * documentId;
+@property (nonatomic, retain) NSString * tags;
 @property (nonatomic, retain) MOCouchDBSyncerDatabase * database;
 @property (nonatomic, retain) NSSet* attachments;
 
-- (NSDictionary *)dictionary;
-- (BOOL)isDesignDocument;
-
 @end
-
-
-@interface MOCouchDBSyncerDocument (CoreDataGeneratedAccessors)
-
-- (void)addAttachmentsObject:(MOCouchDBSyncerAttachment *)value;
-- (void)removeAttachmentsObject:(MOCouchDBSyncerAttachment *)value;
-- (void)addAttachments:(NSSet *)value;
-- (void)removeAttachments:(NSSet *)value;
-
-@end
-

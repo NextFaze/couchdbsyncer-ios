@@ -15,7 +15,7 @@
 
 @implementation CouchDBSyncerFetch
 
-@synthesize url, error, isExecuting, isFinished, response, username, password, fetchType;
+@synthesize url, error, isExecuting, isFinished, username, password, fetchType, document, attachment;
 
 #pragma mark Private
 
@@ -49,7 +49,7 @@
     return self;
 }
 
-- (id)initWithURL:(NSURL *)u delegate:(id<CouchDBSyncerFetchDelegate>)d {
+- (id)initWithURL:(NSURL *)u delegate:(NSObject<CouchDBSyncerFetchDelegate> *)d {
     if((self = [self init])) {
         self.url = u;
         delegate = d;
@@ -65,10 +65,11 @@
 
 - (void)dealloc {
     delegate = nil;
+    [document release];
+    [attachment release];
     [url release];
     [data release];
     [error release];
-    [response release];
     [username release];
     [password release];
     
@@ -131,6 +132,7 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)err {
     if(err.code == -1200) return;  // SSL error - seems to work anyway
     self.error = err;
+    LOG(@"error: %@", err);
     [self finish];
 }
 

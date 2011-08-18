@@ -1,33 +1,54 @@
-// 
-//  MOCouchDBSyncerDocument.m
-//  CouchDBSyncer
 //
-//  Created by ASW on 27/02/11.
-//  Copyright 2011 2moro mobile. All rights reserved.
+//  MOCouchDBSyncerDocument.m
+//  CouchDBSyncer-iOS
+//
+//  Created by Andrew Williams on 18/08/11.
+//  Copyright (c) 2011 2moro mobile. All rights reserved.
 //
 
 #import "MOCouchDBSyncerDocument.h"
-
 #import "MOCouchDBSyncerAttachment.h"
 #import "MOCouchDBSyncerDatabase.h"
 
-@implementation MOCouchDBSyncerDocument 
 
+@implementation MOCouchDBSyncerDocument
 @dynamic revision;
-@dynamic dictionaryData;
 @dynamic parentId;
+@dynamic dictionaryData;
 @dynamic type;
-@dynamic tags;
 @dynamic documentId;
+@dynamic tags;
 @dynamic database;
 @dynamic attachments;
 
-- (NSDictionary *)dictionary {
-	return [NSKeyedUnarchiver unarchiveObjectWithData:self.dictionaryData];
+
+- (void)addAttachmentsObject:(MOCouchDBSyncerAttachment *)value {    
+    NSSet *changedObjects = [[NSSet alloc] initWithObjects:&value count:1];
+    [self willChangeValueForKey:@"attachments" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
+    [[self primitiveValueForKey:@"attachments"] addObject:value];
+    [self didChangeValueForKey:@"attachments" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
+    [changedObjects release];
 }
 
-- (BOOL)isDesignDocument {
-    return [self.documentId hasPrefix:@"_design/"];
+- (void)removeAttachmentsObject:(MOCouchDBSyncerAttachment *)value {
+    NSSet *changedObjects = [[NSSet alloc] initWithObjects:&value count:1];
+    [self willChangeValueForKey:@"attachments" withSetMutation:NSKeyValueMinusSetMutation usingObjects:changedObjects];
+    [[self primitiveValueForKey:@"attachments"] removeObject:value];
+    [self didChangeValueForKey:@"attachments" withSetMutation:NSKeyValueMinusSetMutation usingObjects:changedObjects];
+    [changedObjects release];
 }
+
+- (void)addAttachments:(NSSet *)value {    
+    [self willChangeValueForKey:@"attachments" withSetMutation:NSKeyValueUnionSetMutation usingObjects:value];
+    [[self primitiveValueForKey:@"attachments"] unionSet:value];
+    [self didChangeValueForKey:@"attachments" withSetMutation:NSKeyValueUnionSetMutation usingObjects:value];
+}
+
+- (void)removeAttachments:(NSSet *)value {
+    [self willChangeValueForKey:@"attachments" withSetMutation:NSKeyValueMinusSetMutation usingObjects:value];
+    [[self primitiveValueForKey:@"attachments"] minusSet:value];
+    [self didChangeValueForKey:@"attachments" withSetMutation:NSKeyValueMinusSetMutation usingObjects:value];
+}
+
 
 @end
