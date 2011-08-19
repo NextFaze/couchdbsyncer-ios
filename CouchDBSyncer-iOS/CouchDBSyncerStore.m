@@ -13,16 +13,16 @@
 #import "MOCouchDBSyncerAttachment.h"
 
 #define DefaultModelTypeKey @"type"
+#define DefaultParentKey @"parent_id"
 
 @interface CouchDBSyncerStore(CouchDBSyncerStorePrivate)
 - (NSManagedObjectContext *)managedObjectContext;
 - (BOOL)saveDatabase;
 @end
 
-
 @implementation CouchDBSyncerStore
 
-@synthesize error, modelTypeKey;
+@synthesize error, modelTypeKey, parentKey;
 
 #pragma mark -
 
@@ -44,6 +44,7 @@
     self = [super init];
     if(self) {
         self.modelTypeKey = DefaultModelTypeKey;
+        self.parentKey = DefaultParentKey;
         shippedPath = [path retain];
         [self initDB];        
     }
@@ -96,6 +97,7 @@
     CouchDBSyncerDocument *doc = [[CouchDBSyncerDocument alloc] initWithDocumentId:moDocument.documentId revision:moDocument.revision sequenceId:0 deleted:NO];    
     NSDictionary *dict = [NSKeyedUnarchiver unarchiveObjectWithData:moDocument.dictionaryData];
     [doc setDictionary:dict];
+    doc.parentId = moDocument.parentId;
     
     return [doc autorelease];
 }
@@ -171,19 +173,28 @@
 // given name and url.
 - (CouchDBSyncerDatabase *)database:(NSString *)name url:(NSURL *)url {
     // fetch or create database record
-    MOCouchDBSyncerDatabase *db = [self moDatabaseObjectName:name];
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObjectName:name];
     
-    if(db == nil) {
+    if(moDatabase == nil) {
         // add database record
-        db = [NSEntityDescription insertNewObjectForEntityForName:@"Database" inManagedObjectContext:managedObjectContext];
-        db.name = name;
-        db.url = [url absoluteString];
-        db.sequenceId = 0;
+        moDatabase = [NSEntityDescription insertNewObjectForEntityForName:@"Database" inManagedObjectContext:managedObjectContext];
+        moDatabase.name = name;
+        moDatabase.url = [url absoluteString];
+        moDatabase.sequenceId = 0;
 
         [self saveDatabase];
     }
+    else {
+        // update database url if it has changed
+        NSString *urlString = [url absoluteString];
+        if(![moDatabase.url isEqualToString:urlString]) {
+            LOG(@"updating database url: %@", url);
+            moDatabase.url = urlString;
+            [self saveDatabase];
+        }
+    }
     
-    return [self databaseObject:db];
+    return [self databaseObject:moDatabase];
 }
 
 - (CouchDBSyncerDatabase *)database:(NSString *)name {
@@ -318,6 +329,14 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database AND type == $type AND tags CONTAINS[c] $tag"];
     predicate = [predicate predicateWithSubstitutionVariables:
                  [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", type, @"type", tag, @"tag", nil]];
+    return [self documentsMatching:predicate];
+}
+
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database parent:(CouchDBSyncerDocument *)parent {
+    MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"database == $database AND parentId == $parentId"];
+    predicate = [predicate predicateWithSubstitutionVariables:
+                 [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", parent.documentId, @"parentId", nil]];
     return [self documentsMatching:predicate];
 }
 
@@ -580,7 +599,7 @@
     moDocument.revision = document.revision;
     moDocument.dictionaryData = dictData;
     moDocument.type = [dict valueForKey:modelTypeKey];
-    moDocument.parentId = [dict valueForKey:@"parent_id"];
+    moDocument.parentId = [dict valueForKey:parentKey];
     moDocument.tags = [tags isKindOfClass:[NSArray class]] ? [tags componentsJoinedByString:@","] : nil;
     moDocument.database = moDatabase;
     

@@ -12,13 +12,13 @@
 @interface CouchDBSyncerDocument : CouchDBSyncerObject {
     int sequenceId;   // sequence id associated with changes list
     BOOL deleted;
-    NSString *documentId, *revision;
+    NSString *documentId, *parentId, *revision;
     NSArray *attachments;
 }
 
 @property (nonatomic, readonly) BOOL deleted;
 @property (nonatomic, readonly) int sequenceId;
-@property (nonatomic, readonly) NSString *documentId, *revision;
+@property (nonatomic, retain) NSString *documentId, *parentId, *revision;
 @property (nonatomic, readonly) NSArray *attachments;
 
 - (id)initWithDocumentId:(NSString *)docid revision:(NSString *)rev sequenceId:(int)seq deleted:(BOOL)del;

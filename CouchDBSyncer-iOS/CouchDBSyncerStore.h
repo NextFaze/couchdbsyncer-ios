@@ -14,7 +14,7 @@
 #import "CouchDBSyncerAttachment.h"
 
 @interface CouchDBSyncerStore : NSObject {
-    NSString *modelTypeKey;
+    NSString *modelTypeKey, *parentKey;
     
     // core data
     NSManagedObjectModel *managedObjectModel;
@@ -29,7 +29,7 @@
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-@property (nonatomic, retain) NSString *modelTypeKey;
+@property (nonatomic, retain) NSString *modelTypeKey, *parentKey;
 @property (nonatomic, retain) NSError *error;
 
 - (id)initWithShippedDatabasePath:(NSString *)shippedPath;
@@ -58,6 +58,8 @@
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type tagged:(NSString *)tag;
 - (NSArray *)documents:(CouchDBSyncerDatabase *)database tagged:(NSString *)tag;
+- (NSArray *)documents:(CouchDBSyncerDatabase *)database parent:(CouchDBSyncerDocument *)parent;
+
 - (CouchDBSyncerDocument *)document:(CouchDBSyncerDatabase *)database documentId:(NSString *)documentId;
 
 // get document types (array of NSString)

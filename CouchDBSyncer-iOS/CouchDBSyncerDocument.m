@@ -12,7 +12,7 @@
 
 @implementation CouchDBSyncerDocument
 
-@synthesize deleted, documentId, revision, sequenceId, attachments;
+@synthesize deleted, documentId, revision, sequenceId, attachments, parentId;
 
 #pragma mark -
 

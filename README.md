@@ -91,8 +91,12 @@ documents can be accessed using the following methods of CouchDBSyncerStore.
     - (NSArray *)documents:(CouchDBSyncerDatabase *)database ofType:(NSString *)type;
 
 The above methods return arrays of CouchDBSyncerDocument objects.  The dictionary method of CouchDBSyncerDocument can be used to access the 
-document contents as an NSDictionary (converted from JSON).
-The attachments method of MOCouchDBSyncerDocument returns an NSArray of attachments (MOCouchDBSyncerAttachment records) associated with the document.
+document contents as an NSDictionary (converted from JSON).  Each document has an array of attachment metadata attached to it.
+
+Attachment content is not read from the database by the above methods. To fetch attachment content, use the following methods of CouchDBSyncerStore.
+
+    - (NSArray *)attachments:(CouchDBSyncerDocument *)document;
+    - (CouchDBSyncerAttachment *)attachment:(CouchDBSyncerDocument *)document named:(NSString *)name;
 
 Tunables
 --------
