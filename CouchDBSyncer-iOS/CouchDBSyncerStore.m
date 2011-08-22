@@ -14,6 +14,7 @@
 
 #define DefaultModelTypeKey @"type"
 #define DefaultParentKey @"parent_id"
+#define LOG_ERROR(e) if(e) LOG(@"error: %@", e)
 
 @interface CouchDBSyncerStore(CouchDBSyncerStorePrivate)
 - (NSManagedObjectContext *)managedObjectContext;
@@ -122,6 +123,7 @@
     NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:name, @"name", nil];
     NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"databaseByName" substitutionVariables:data];
     NSArray *databases = [moc executeFetchRequest:fetch error:&err];
+    LOG_ERROR(err);
     MOCouchDBSyncerDatabase *db = databases.count ? [databases objectAtIndex:0] : nil;
     return db;
 }
@@ -140,6 +142,7 @@
     NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:documentId, @"documentId", nil];
     NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"documentById" substitutionVariables:data];
     NSArray *documents = [moc executeFetchRequest:fetch error:&err];
+    LOG_ERROR(err);
     return documents.count ? [documents objectAtIndex:0] : nil;	
 }
 
@@ -159,6 +162,7 @@
     NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:att.documentId, @"documentId", att.filename, @"filename", nil];
     NSFetchRequest *fetch = [managedObjectModel fetchRequestFromTemplateWithName:@"attachmentByDocumentIdAndFilename" substitutionVariables:data];
     NSArray *attachments = [moc executeFetchRequest:fetch error:&err];
+    LOG_ERROR(err);
     return attachments.count ? [attachments objectAtIndex:0] : nil;	
 }
 
@@ -177,6 +181,7 @@
     
     if(moDatabase == nil) {
         // add database record
+        LOG(@"creating new database record");
         moDatabase = [NSEntityDescription insertNewObjectForEntityForName:@"Database" inManagedObjectContext:managedObjectContext];
         moDatabase.name = name;
         moDatabase.url = [url absoluteString];
@@ -259,7 +264,8 @@
                  [NSDictionary dictionaryWithObjectsAndKeys:moDatabase, @"database", nil]];
     [request setEntity:[NSEntityDescription entityForName:entityName inManagedObjectContext:managedObjectContext]];
     [request setPredicate:predicate];
-    NSUInteger count = [managedObjectContext countForFetchRequest:request error:&err];	
+    NSUInteger count = [managedObjectContext countForFetchRequest:request error:&err];
+    LOG_ERROR(err);
     [request release];
     
     return count;	
@@ -297,6 +303,7 @@
     [request setEntity:[NSEntityDescription entityForName:@"Document" inManagedObjectContext:managedObjectContext]];
     [request setPredicate:predicate];
     NSArray *moDocuments = [managedObjectContext executeFetchRequest:request error:&err];
+    LOG_ERROR(err);
     [request release];
     
     NSMutableArray *documents = [NSMutableArray array];
@@ -437,6 +444,7 @@
     NSError *err = nil;
     NSString *dbfile = [NSString stringWithFormat:@"couchdbsyncer.sqlite"];
     NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] stringByAppendingPathComponent:dbfile]];	
+    NSString *fullShippedPath = shippedPath ? [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:shippedPath] : nil;
     
     // handle db upgrade
     NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -448,9 +456,10 @@
     if (![[NSFileManager defaultManager] fileExistsAtPath:storeUrl.path]) {
         // database doesn't exist.
         // install shipped database if provided
-        if(shippedPath) {
-            LOG(@"installing shipped database");
-            [[NSFileManager defaultManager] copyItemAtPath:shippedPath toPath:storeUrl.path error:&err];
+        if(fullShippedPath) {
+            LOG(@"no database, installing shipped database (%@ -> %@)", fullShippedPath, storeUrl.path);
+            [[NSFileManager defaultManager] copyItemAtPath:fullShippedPath toPath:storeUrl.path error:&err];
+            LOG_ERROR(err);
         }
     }
     
@@ -467,10 +476,11 @@
 
             options = nil;
  
-            if(i == 0 && shippedPath) {
+            if(i == 0 && fullShippedPath) {
                 // install shipped database
                 LOG(@"installing shipped database");
-                [[NSFileManager defaultManager] copyItemAtPath:shippedPath toPath:storeUrl.path error:&err];
+                [[NSFileManager defaultManager] copyItemAtPath:fullShippedPath toPath:storeUrl.path error:&err];
+                LOG_ERROR(err);
             }
             else if(i == 2) {
                 // unrecoverable error
