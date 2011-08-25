@@ -148,31 +148,6 @@
     [fetchThread start];
 }
 
-- (void)updateThread {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    [self resetReqCounters];
-    
-    [startedAt release];
-    startedAt = [[NSDate date] retain];
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/_changes?since=%d", database.url, database.sequenceId]];
-    [changeFetcher release];
-    changeFetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
-    changeFetcher.fetchType = CouchDBSyncerFetchTypeChanges;
-    [fetchQueue addOperation:changeFetcher];
-    countReq++;
-    
-    // wait until all operations are finished.
-    // when this returns, sync is complete
-    [fetchQueue waitUntilAllOperationsAreFinished];
-    
-    LOG(@"all operations finished");
-    [self completed];
-    
-    [pool release];
-}
-
 // fetches document / attachments (adds to fetch queue)
 - (void)fetchDocument:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)att priority:(NSOperationQueuePriority)priority {
 
@@ -247,14 +222,21 @@
     }    
 }
 
+/*
+ - (BOOL)couchDBSyncerDownloadPolicy:(CouchDBSyncerDocument *)document;
+ - (BOOL)couchDBSyncerDownloadPolicy:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)attachment;
+ - (NSOperationQueuePriority)couchDBSyncerDownloadPriority:(CouchDBSyncerDocument *)document;
+ - (NSOperationQueuePriority)couchDBSyncerDownloadPriority:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)attachment;
+ */
+
 - (void)fetchDocument:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)att {
     BOOL download = YES;
     NSOperationQueuePriority priority = NSOperationQueuePriorityLow;
     
-    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicyAttachment:)])
-        download = [downloadPolicyDelegate couchDBSyncerDownloadPolicyAttachment:att];
-    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicyAttachmentPriority:)])
-        priority = [downloadPolicyDelegate couchDBSyncerDownloadPolicyAttachmentPriority:att];
+    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicy:attachment:)])
+        download = [downloadPolicyDelegate couchDBSyncerDownloadPolicy:document attachment:att];
+    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPriority:attachment:)])
+        priority = [downloadPolicyDelegate couchDBSyncerDownloadPriority:document attachment:att];
     
     if(download) {
         [self fetchDocument:document attachment:att priority:priority];
@@ -268,10 +250,10 @@
     BOOL download = [doc isDesignDocument] ? NO : YES;
     NSOperationQueuePriority priority = NSOperationQueuePriorityNormal;
     
-    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicyDocument:)])
-        download = [downloadPolicyDelegate couchDBSyncerDownloadPolicyDocument:doc];
-    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicyDocumentPriority:)])
-        priority = [downloadPolicyDelegate couchDBSyncerDownloadPolicyDocumentPriority:doc];
+    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPolicy:)])
+        download = [downloadPolicyDelegate couchDBSyncerDownloadPolicy:doc];
+    if([downloadPolicyDelegate respondsToSelector:@selector(couchDBSyncerDownloadPriority:)])
+        priority = [downloadPolicyDelegate couchDBSyncerDownloadPriority:doc];
     
     if(download) {
         [self fetchDocument:doc priority:priority];
@@ -295,6 +277,44 @@
     for(CouchDBSyncerAttachment *att in attachments) {
         [self fetchDocument:document attachment:att];
     }
+}
+
+#pragma mark -
+
+- (void)updateThread {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    [self resetReqCounters];
+    
+    [startedAt release];
+    startedAt = [[NSDate date] retain];
+    
+    // download unfetched attachments.
+    // (this queries the download policy again)
+    NSArray *staleAttachments = [store staleAttachments:database];
+    if([staleAttachments count] > 0) {
+        LOG(@"downloading %d unfetched attachments", [staleAttachments count]);
+        for(CouchDBSyncerAttachment *attachment in staleAttachments) {
+            CouchDBSyncerDocument *document = [store document:database documentId:attachment.documentId];
+            [self fetchDocument:document attachment:attachment];
+        }
+    }
+    
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/_changes?since=%d", database.url, database.sequenceId]];
+    [changeFetcher release];
+    changeFetcher = [[CouchDBSyncerFetch alloc] initWithURL:url delegate:self];
+    changeFetcher.fetchType = CouchDBSyncerFetchTypeChanges;
+    [fetchQueue addOperation:changeFetcher];
+    countReq++;
+    
+    // wait until all operations are finished.
+    // when this returns, sync is complete
+    [fetchQueue waitUntilAllOperationsAreFinished];
+    
+    LOG(@"all operations finished");
+    [self completed];
+    
+    [pool release];
 }
 
 #pragma mark -
@@ -374,17 +394,6 @@
         }
         
         [self enqueueBulkFetch];
-        
-        // download unfetched attachments.
-        NSArray *staleAttachments = [store staleAttachments:database];
-        if([staleAttachments count] > 0) {
-            LOG(@"downloading %d unfetched attachments", [staleAttachments count]);
-            for(CouchDBSyncerAttachment *attachment in staleAttachments) {
-                CouchDBSyncerDocument *document = [store document:database documentId:attachment.documentId];
-                [self fetchDocument:document attachment:attachment];
-            }
-        }
-
     }
     else {
         // fetched data
