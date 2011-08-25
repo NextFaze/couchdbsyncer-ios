@@ -64,11 +64,10 @@
 @protocol CouchDBSyncerDownloadPolicyDelegate <NSObject>
 
 @optional
-- (BOOL)couchDBSyncerDownloadPolicyDocument:(CouchDBSyncerDocument *)document;
-- (BOOL)couchDBSyncerDownloadPolicyAttachment:(CouchDBSyncerAttachment *)attachment;
-- (NSOperationQueuePriority)couchDBSyncerDownloadPolicyDocumentPriority:(CouchDBSyncerDocument *)document;
-- (NSOperationQueuePriority)couchDBSyncerDownloadPolicyAttachmentPriority:(CouchDBSyncerAttachment *)attachment;
-
+- (BOOL)couchDBSyncerDownloadPolicy:(CouchDBSyncerDocument *)document;
+- (BOOL)couchDBSyncerDownloadPolicy:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)attachment;
+- (NSOperationQueuePriority)couchDBSyncerDownloadPriority:(CouchDBSyncerDocument *)document;
+- (NSOperationQueuePriority)couchDBSyncerDownloadPriority:(CouchDBSyncerDocument *)document attachment:(CouchDBSyncerAttachment *)attachment;
 @end
 
 @protocol CouchDBSyncerDelegate <NSObject>
