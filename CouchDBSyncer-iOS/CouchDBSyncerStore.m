@@ -645,7 +645,7 @@
     if([old count]) {
         LOG(@"removing %d old attachments", [old count]);
         for(MOCouchDBSyncerAttachment *moatt in [old allObjects]) {
-            [managedObjectContext deleteObject:moatt];
+            [moc deleteObject:moatt];
         }
     }
     

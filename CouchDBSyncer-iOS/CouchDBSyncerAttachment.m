@@ -8,7 +8,6 @@
 
 #import "CouchDBSyncerAttachment.h"
 
-
 @implementation CouchDBSyncerAttachment
 
 @synthesize contentType, filename, length, revpos, deleted, documentId, content, stale;
