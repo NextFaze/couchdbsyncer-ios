@@ -17,6 +17,10 @@ Installation
 
 CouchDBSyncer is a Cocoa Touch Static Library project, and can be incorporated into other xcode projects in the usual ways.
 
+You will need CoreData framework to be linked.
+
+You will need to add a copy of the CouchDBSyncer database model to your project (called CouchDBSyncer.xcdatamodeld).
+
 Usage
 -----
 
