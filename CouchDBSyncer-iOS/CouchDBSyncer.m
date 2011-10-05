@@ -341,17 +341,22 @@
     
     countHttpFin++;
     
-    if(fetcher.error && fetcher.fetchType != CouchDBSyncerFetchTypeAttachment) {
-        // error occurred
+    if(fetcher.error) {
+        // download error occurred
+        
         // ignore attachment download errors - they will be redownloaded later
         // TODO: retry fetches a few times ?
-        self.error = fetcher.error;
+        if(fetcher.fetchType != CouchDBSyncerFetchTypeAttachment) {
+            // if failure occured fetching list of changes or a document, abort sync
+            self.error = fetcher.error;
+
+            // abort all outstanding fetch requests
+            [self abort];
         
-        // abort all outstanding fetch requests
-        [self abort];
+            // notify delegate
+            [self callDelegate:@selector(couchDBSyncerFailed:)];
+        }
         
-        // notify delegate
-        [self callDelegate:@selector(couchDBSyncerFailed:)];
         return;
     }
     

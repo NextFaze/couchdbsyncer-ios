@@ -73,9 +73,9 @@
 // used by couchdbsyncer
 // get an update context for the given database and current thread
 - (CouchDBSyncerUpdateContext *)updateContext:(CouchDBSyncerDatabase *)database;
-- (void)update:(CouchDBSyncerUpdateContext *)context database:(CouchDBSyncerDatabase *)database;
-- (void)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document;
-- (void)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment;
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context database:(CouchDBSyncerDatabase *)database;
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document;
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment;
 
 // returns a list of all stale attachments (need downloading)
 - (NSArray *)staleAttachments:(CouchDBSyncerDatabase *)database;

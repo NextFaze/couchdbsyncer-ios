@@ -67,6 +67,7 @@
 
 #pragma mark Accessors
 
+// save database, return true on success
 - (BOOL)saveDatabase:(NSManagedObjectContext *)moc {
     NSError *err = nil;
     if (![moc save:&err]) {
@@ -275,9 +276,11 @@
     MOCouchDBSyncerDatabase *moDatabase = [self moDatabaseObject:database];
     int docs = [self countForEntityName:@"Document" database:moDatabase];
     int attachments = [self countForEntityName:@"Attachment" database:moDatabase];
+    int stale = [[self staleAttachments:database] count];
     
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt:attachments], @"attachments",
+            [NSNumber numberWithInt:stale], @"stale attachments",
             [NSNumber numberWithInt:docs], @"documents",
             nil];
 }
@@ -366,7 +369,7 @@
     return result;
 }
 
-#pragma mark Attachments (with content) fetching
+#pragma mark - Attachments (with content) fetching
 
 // return attachments with content for the given document
 - (NSArray *)attachments:(CouchDBSyncerDocument *)document {
@@ -403,6 +406,7 @@
     for(MOCouchDBSyncerAttachment *moAttachment in list) {
         [result addObject:[self attachmentObject:moAttachment]];
     }
+    LOG(@"%d stale attachments", [result count]);
     return result;
 }
 
@@ -515,38 +519,6 @@
     return managedObjectContext;
 }
 
-
-/*
-- (void)syncerFoundDeletedDocument:(CouchDBSyncerDocument *)doc {
-
-}
-
-- (void)syncerDidFetchDatabaseInformation:(NSDictionary *)info {
-    LOG(@"database info: %@", info);
-    
-    int docDelCount = [[info valueForKey:@"doc_del_count"] intValue];
-    int docUpdateSeq = [[info valueForKey:@"doc_update_seq"] intValue];
-    NSString *dbName = [info valueForKey:@"db_name"];
-    
-    if(docDelCount < [db.docDelCount intValue] || docUpdateSeq < [db.docUpdateSeq intValue]) {
-        LOG(@"lower deletion or update sequence count on server - removing local store");
-        [self purge];
-    }
-    else if(dbName && ![db.dbName isEqualToString:dbName]) {
-        LOG(@"database name changed - removing local store");
-        [self purge];
-    }
-    db.dbName = dbName;
-    db.docDelCount = [NSNumber numberWithInt:docDelCount];
-    db.docUpdateSeq = [NSNumber numberWithInt:docUpdateSeq];
-    
-    [self saveDatabase];  // save database without updating sequence
-    
-    // continue with sync
-    [syncer fetchChanges];
-}
- */
-
 #pragma mark -
 #pragma mark Syncer support
 
@@ -564,34 +536,36 @@
     return context;
 }
 
-- (void)update:(CouchDBSyncerUpdateContext *)context database:(CouchDBSyncerDatabase *)database {
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context database:(CouchDBSyncerDatabase *)database {
     NSManagedObjectContext *moc = context.managedObjectContext;
     MOCouchDBSyncerDatabase *moDatabase = context.moDatabase;
     moDatabase.name = database.name;
     moDatabase.url = [database.url absoluteString];
 
-    [self saveDatabase:moc];
+    return [self saveDatabase:moc];
 }
 
-- (void)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document {
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context document:(CouchDBSyncerDocument *)document {
     NSManagedObjectContext *moc = context.managedObjectContext;
     MOCouchDBSyncerDatabase *moDatabase = context.moDatabase;
     MOCouchDBSyncerDocument *moDocument = [self moDocumentObject:document context:moc];
+    BOOL success = YES;
     
     LOG(@"document: %@ (seq %d)", document, document.sequenceId);
     
     if(document.deleted) {
         if(moDocument) {
             LOG(@"removing document: %@ (seq %d)", document, document.sequenceId);
-        
+
             // delete document & attachments
             [moc deleteObject:moDocument];
-        
+
             // save database (updates sequence id)
             moDatabase.sequenceId = [NSNumber numberWithInt:document.sequenceId];
-            [self saveDatabase:moc];
+            success = [self saveDatabase:moc];
+            if(success) context.database.sequenceId = document.sequenceId;
         }
-        return;
+        return success;
     }
     
     // save document
@@ -651,17 +625,20 @@
     
     // save database (updates sequence id)
     moDatabase.sequenceId = [NSNumber numberWithInt:document.sequenceId];
-    [self saveDatabase:moc];
+    success = [self saveDatabase:moc];
+
+    if(success) context.database.sequenceId = document.sequenceId;        
+    return success;
 }
 
-- (void)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment {
+- (BOOL)update:(CouchDBSyncerUpdateContext *)context attachment:(CouchDBSyncerAttachment *)attachment {
     LOG(@"attachment: %@", attachment);
     NSManagedObjectContext *moc = context.managedObjectContext;
     MOCouchDBSyncerAttachment *moAttachment = [self moAttachmentObject:attachment context:moc];
     if(moAttachment == nil) {
         // attachment record should be in the database (added by didFetchDocument)
         LOG(@"internal error: no attachment record found for %@", attachment);
-        return;
+        return NO;
     }
     
     moAttachment.content = attachment.content;
@@ -670,7 +647,7 @@
     moAttachment.revpos = [NSNumber numberWithInt:attachment.revpos];
     
     // save database 
-    [self saveDatabase:moc];
+    return [self saveDatabase:moc];
 }
 
 @end
